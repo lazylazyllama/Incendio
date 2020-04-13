@@ -30,8 +30,9 @@ String colorMode = colorModeEnum[0];
 ConfigData data;
 
 const unsigned char redPin = 12;
-const unsigned char greenPin = 13;
-const unsigned char bluePin = 14;
+const unsigned char greenPin = 14;
+const unsigned char bluePin = 13;
+const unsigned char whitePin = 15;
 
 void setupLamp(void) {
   pinMode(redPin, OUTPUT);
@@ -40,6 +41,8 @@ void setupLamp(void) {
   digitalWrite(greenPin, HIGH);
   pinMode(bluePin, OUTPUT);
   digitalWrite(bluePin, HIGH);
+  pinMode(whitePin, OUTPUT);
+  digitalWrite(whitePin, HIGH);
 }
 
 void setup(void) {
@@ -93,7 +96,7 @@ void setup(void) {
   Serial.println(device.id);
 }
 
-void update(String *color, float const brightness) {
+void updateColor(String *color, float const brightness) {
   if (!color) {
     return;
   }
@@ -109,10 +112,27 @@ void update(String *color, float const brightness) {
     analogWrite(redPin, red * dim, 255U);
     analogWrite(greenPin, green * dim, 255U);
     analogWrite(bluePin, blue * dim, 255U);
+    analogWrite(whitePin, 0, 255U);
   #elif defined(ESP8266)
     analogWrite(redPin, red * dim);
     analogWrite(greenPin, green * dim);
     analogWrite(bluePin, blue * dim);
+    analogWrite(whitePin, 0);
+  #endif
+}
+
+void updateWhite(float const brightness) {
+  int dim = map(brightness, 0, 100, 255, 0);
+  #ifdef ESP32
+    analogWrite(redPin, 0, 255U);
+    analogWrite(greenPin, 0, 255U);
+    analogWrite(bluePin, 0, 255U);
+    analogWrite(whitePin, dim, 255U);
+  #elif defined(ESP8266)
+    analogWrite(redPin, 0);
+    analogWrite(greenPin, 0);
+    analogWrite(bluePin, 0);
+    analogWrite(whitePin, dim);
   #endif
 }
 
@@ -127,7 +147,11 @@ void loop(void) {
   bool on = deviceOn.getValue().boolean;
   float brightness = deviceBrightness.getValue().number;
   int colorTemperature = deviceColorTemperature.getValue().integer;
-  update(&color, on ? brightness : 0);
+  if (colorMode.compareTo("color")) {
+    updateColor(&color, on ? brightness : 0);
+  } else if (colorMode.compareTo("temperature")) {
+    updateWhite(on ? brightness : 0);
+  }
 
   digitalWrite(LED_BUILTIN, on ? HIGH : LOW);
   if (on != data.lastOn) {
