@@ -15,8 +15,8 @@
 
 struct ConfigData {
   bool lastOn;
+  float lastBrightness;
   String lastColor;
-  int lastBrightness;
   String lastColorMode;
   int lastColorTemperature;
 };

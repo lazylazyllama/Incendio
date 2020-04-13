@@ -93,7 +93,7 @@ void setup(void) {
   Serial.println(device.id);
 }
 
-void update(String *color, int const brightness) {
+void update(String *color, float const brightness) {
   if (!color) {
     return;
   }
@@ -125,16 +125,12 @@ void loop(void) {
   adapter->update();
 
   bool on = deviceOn.getValue().boolean;
-  int brightness = deviceBrightness.getValue().number;
-  //int colorTemperature = deviceColorTemperature.getValue().integer;
+  float brightness = deviceBrightness.getValue().number;
+  int colorTemperature = deviceColorTemperature.getValue().integer;
   update(&color, on ? brightness : 0);
 
-  if (deviceOn.changedValueOrNull() != nullptr) {
-    Serial.println(on);
-  }
-
   digitalWrite(LED_BUILTIN, on ? HIGH : LOW);
-  /* if (on != data.lastOn) {
+  if (on != data.lastOn) {
     Serial.print(device.id);
     Serial.print(": on: ");
     Serial.println(on);
@@ -175,5 +171,5 @@ void loop(void) {
     colorMode = colorModeEnum[1]; // colorMode = "temperature"
     data.lastColorTemperature = colorTemperature;
     ConfigManager::save(data);
-  } */
+  }
 }

@@ -22,8 +22,8 @@ ConfigData ConfigManager::load() {
   ConfigData configData;
 
   configData.lastOn = doc["lastOn"] | false;
+  configData.lastBrightness = doc["lastBrightness"] | 100.0f;
   configData.lastColor = doc["lastColor"] | "#ffffff";
-  configData.lastBrightness = doc["lastBrightness"] | 100;
   configData.lastColorMode = doc["lastColorMode"] | "temperature";
   configData.lastColorTemperature = doc["lastColorTemperature"] | 2700;
 
@@ -52,8 +52,8 @@ void ConfigManager::save(ConfigData configData) {
   StaticJsonDocument<dataBackupFileSize> doc;
 
   doc["lastOn"] = configData.lastOn;
-  doc["lastColor"] = configData.lastColor;
   doc["lastBrightness"] = configData.lastBrightness;
+  doc["lastColor"] = configData.lastColor;
   doc["lastColorMode"] = configData.lastColorMode;
   doc["lastColorTemperature"] = configData.lastColorTemperature;
 
