@@ -4,9 +4,13 @@
 #define dataBackupFileSize 512
 
 ConfigData ConfigManager::load() {
-  SPIFFS.begin(true);
+  #ifdef ESP32
+    SPIFFS.begin(true);
+  #elif defined(ESP8266)
+    SPIFFS.begin();
+  #endif
 
-  File file = SPIFFS.open(dataBackupFileName);
+  File file = SPIFFS.open(dataBackupFileName, FILE_READ);
 
   StaticJsonDocument<dataBackupFileSize> doc;
 
@@ -31,10 +35,11 @@ ConfigData ConfigManager::load() {
 }
 
 void ConfigManager::save(ConfigData configData) {
-  if(!SPIFFS.begin(true)){
-    Serial.println("An Error has occurred while mounting SPIFFS");
-    return;
-  }
+  #ifdef ESP32
+    SPIFFS.begin(true);
+  #elif defined(ESP8266)
+    SPIFFS.begin();
+  #endif
 
   SPIFFS.remove(dataBackupFileName);
 

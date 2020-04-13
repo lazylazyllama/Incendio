@@ -4,15 +4,15 @@
 #endif
 
 #ifdef WIFI_SSID
-const char *ssid = WIFI_SSID;
+  const char *ssid = WIFI_SSID;
 #else
-const char *ssid = "";
+  const char *ssid = "";
 #endif
 
 #ifdef WIFI_PASSWORD
-const char *password = WIFI_PASSWORD;
+  const char *password = WIFI_PASSWORD;
 #else
-const char *password = "";
+  const char *password = "";
 #endif
 
 void WifiManager::begin(void) {
@@ -25,8 +25,13 @@ void WifiManager::begin(void) {
   WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
 
-  //esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
-  WiFi.setSleep(true); //this would use WIFI_PS_MIN_MODEM
+  #ifdef ESP32
+    //esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
+    WiFi.setSleep(true); //this would use WIFI_PS_MIN_MODEM
+  #elif defined(ESP8266)
+    WiFi.setSleepMode(WIFI_MODEM_SLEEP);
+    WiFi.forceSleepBegin();
+  #endif
 
   WiFi.begin(ssid, password);
   Serial.println("");

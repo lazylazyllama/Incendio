@@ -2,9 +2,15 @@
 #define WIFI_MANAGER_H
 
 #include <Arduino.h>
-#include <WiFi.h>
-#include <esp_wifi.h>
-#include <esp_wifi_types.h>
+
+#ifdef ESP32
+  #include <WiFi.h>
+  #include <esp_wifi.h>
+  #include <esp_wifi_types.h>
+#elif defined(ESP8266)
+  #include <ESP8266WiFi.h>
+#endif
+
 
 class WifiManager {
   public:

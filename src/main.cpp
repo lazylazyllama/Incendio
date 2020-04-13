@@ -94,8 +94,9 @@ void setup(void) {
 }
 
 void update(String *color, int const brightness) {
-  if (!color)
+  if (!color) {
     return;
+  }
   float dim = brightness / 100.0;
   int red, green, blue;
   if (color && (color->length() == 7) && color->charAt(0) == '#') {
@@ -104,9 +105,15 @@ void update(String *color, int const brightness) {
     sscanf(2 + hex, "%2x", &green);
     sscanf(4 + hex, "%2x", &blue);
   }
-  analogWrite(redPin, red * dim, 255U);
-  analogWrite(greenPin, green * dim, 255U);
-  analogWrite(bluePin, blue * dim, 255U);
+  #ifdef ESP32
+    analogWrite(redPin, red * dim, 255U);
+    analogWrite(greenPin, green * dim, 255U);
+    analogWrite(bluePin, blue * dim, 255U);
+  #elif defined(ESP8266)
+    analogWrite(redPin, red * dim);
+    analogWrite(greenPin, green * dim);
+    analogWrite(bluePin, blue * dim);
+  #endif
 }
 
 void loop(void) {
@@ -119,11 +126,15 @@ void loop(void) {
 
   bool on = deviceOn.getValue().boolean;
   int brightness = deviceBrightness.getValue().number;
-  int colorTemperature = deviceColorTemperature.getValue().integer;
+  //int colorTemperature = deviceColorTemperature.getValue().integer;
   update(&color, on ? brightness : 0);
 
+  if (deviceOn.changedValueOrNull() != nullptr) {
+    Serial.println(on);
+  }
+
   digitalWrite(LED_BUILTIN, on ? HIGH : LOW);
-  if (on != data.lastOn) {
+  /* if (on != data.lastOn) {
     Serial.print(device.id);
     Serial.print(": on: ");
     Serial.println(on);
@@ -164,5 +175,5 @@ void loop(void) {
     colorMode = colorModeEnum[1]; // colorMode = "temperature"
     data.lastColorTemperature = colorTemperature;
     ConfigManager::save(data);
-  }
+  } */
 }
