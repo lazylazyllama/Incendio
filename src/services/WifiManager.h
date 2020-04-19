@@ -5,18 +5,30 @@
 #include <ESPAsyncWebServer.h>
 #include <ESPAsyncWiFiManager.h>
 
+#include <ArduinoJson.h>
+
 #ifdef ESP32
   #include <WiFi.h>
   #include <esp_wifi.h>
   #include <esp_wifi_types.h>
+  #include <SPIFFS.h>
 #elif defined(ESP8266)
   #include <ESP8266WiFi.h>
+  #include <SPI.h>
+  #include <FS.h>
+  #define FILE_READ       "r"
+  #define FILE_WRITE      "w"
+  #define FILE_APPEND     "a"
 #endif
 
 class WifiManager {
   public:
     static void begin(void);
     static String getCustomDeviceName(void);
+
+  private:
+    static void loadCustomParameters(void);
+    static void saveCustomParameters(void);
 };
 
 const char HTTP_CUSTOM_STYLE[] PROGMEM = R"rawliteral(
