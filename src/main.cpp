@@ -150,11 +150,11 @@ void loop(void) {
   bool on = deviceOn.getValue().boolean;
   float brightness = deviceBrightness.getValue().number;
   int colorTemperature = deviceColorTemperature.getValue().integer;
-  /* if (colorMode.compareTo("color")) {
+  if (colorMode.compareTo("color")) {
     updateColor(&color, on ? brightness : 0);
   } else if (colorMode.compareTo("temperature")) {
     updateWhite(on ? brightness : 0);
-  } */
+  }
 
   digitalWrite(LED_BUILTIN, on ? HIGH : LOW);
   
