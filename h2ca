@@ -1,0 +1,36 @@
+#!/bin/bash
+echo file: $1
+
+file=`basename -s .html $1`
+
+echo $file
+
+cat <<EOF > $file.c
+#include <pgmspace.h>
+
+const char ${file}_html[] PROGMEM = {
+EOF
+
+echo -n "0x" >> $file.c 
+xxd -ps -c 1 $1 | sed -ze "s/\n/,0x/g" >> $file.c
+
+echo "00" >> $file.c
+echo "};" >> $file.c
+
+
+cat <<EOF > $file.hpp
+
+#ifndef ${file}_HTML_HPP
+#define ${file}_HTML_HPP
+
+#include <pgmspace.h>
+
+extern "C" {
+
+extern const char ${file}_html[] PROGMEM;
+
+}
+#endif
+
+
+EOF

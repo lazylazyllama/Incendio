@@ -4,18 +4,18 @@
 #include <Thing.h>
 #include <WebThingAdapter.h>
 
-#include "services/WifiManager.h"
 #include "services/OTAManager.h"
+#include "services/WifiManager.h"
 #include "services/ConfigManager.h"
 
 #ifdef ESP32
-#include <analogWrite.h>
+  #include <analogWrite.h>
 #endif
 
 WebThingAdapter *adapter;
 
 const char *deviceTypes[] = {"OnOffSwitch", "Light", "ColorControl", nullptr};
-ThingDevice device("lasse-lightstrip", "Lasse Lightstrip", deviceTypes);
+ThingDevice device("lightstrip", "Lightstrip", deviceTypes);
 
 ThingProperty deviceOn("on", "Whether the led is turned on", BOOLEAN, "OnOffProperty");
 ThingProperty deviceBrightness("brithgness", "The brithgness of light from 0-100", NUMBER, "BrightnessProperty");
@@ -50,13 +50,19 @@ void setup(void) {
   #ifdef ESP32
     btStop();
   #endif
+
   WifiManager::begin();
   OTAManager::begin();
+
+  String customDeviceName = WifiManager::getCustomDeviceName();
+  if (!customDeviceName.equals("")) {
+    device.title = customDeviceName;
+  }
 
   setupLamp();
   data = ConfigManager::load();
 
-  adapter = new WebThingAdapter("lasse-lightstrip-adapter", WiFi.localIP());
+  adapter = new WebThingAdapter("lasse-lightstrip-adapter", WiFi.localIP(), 443);
   
   device.addProperty(&deviceOn);
   ThingPropertyValue onValue;
@@ -89,7 +95,7 @@ void setup(void) {
   adapter->addDevice(&device);
 
   adapter->begin();
-  Serial.println("HTTP server started");
+  Serial.println("Webthings HTTP server started");
   Serial.print("http://");
   Serial.print(WiFi.localIP());
   Serial.print("/things/");
@@ -137,9 +143,6 @@ void updateWhite(float const brightness) {
 }
 
 void loop(void) {
-  if (WiFi.status() != WL_CONNECTED) {
-    WifiManager::begin();
-  }
   OTAManager::handle();
 
   adapter->update();
@@ -147,13 +150,14 @@ void loop(void) {
   bool on = deviceOn.getValue().boolean;
   float brightness = deviceBrightness.getValue().number;
   int colorTemperature = deviceColorTemperature.getValue().integer;
-  if (colorMode.compareTo("color")) {
+  /* if (colorMode.compareTo("color")) {
     updateColor(&color, on ? brightness : 0);
   } else if (colorMode.compareTo("temperature")) {
     updateWhite(on ? brightness : 0);
-  }
+  } */
 
   digitalWrite(LED_BUILTIN, on ? HIGH : LOW);
+  
   if (on != data.lastOn) {
     Serial.print(device.id);
     Serial.print(": on: ");
@@ -170,7 +174,7 @@ void loop(void) {
     data.lastBrightness = brightness;
     ConfigManager::save(data);
   }
-  if (color.compareTo(data.lastColor)) {
+  if (!color.equals(data.lastColor)) {
     Serial.print(device.id);
     Serial.print(", color: ");
     Serial.println(color);
@@ -179,7 +183,7 @@ void loop(void) {
     data.lastColor = color;
     ConfigManager::save(data);
   }
-  if (colorMode.compareTo(data.lastColorMode)) {
+  if (!colorMode.equals(data.lastColorMode)) {
     Serial.print(device.id);
     Serial.print(", colorMode: ");
     Serial.println(colorMode);

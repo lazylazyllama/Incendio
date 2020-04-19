@@ -5,10 +5,14 @@
 
 ConfigData ConfigManager::load() {
   #ifdef ESP32
-    SPIFFS.begin(true);
+    bool ok = SPIFFS.begin(true);
   #elif defined(ESP8266)
-    SPIFFS.begin();
+    bool ok = SPIFFS.begin();
   #endif
+
+  if(!ok) {
+    SPIFFS.format();
+  }
 
   File file = SPIFFS.open(dataBackupFileName, FILE_READ);
 
@@ -36,10 +40,14 @@ ConfigData ConfigManager::load() {
 
 void ConfigManager::save(ConfigData configData) {
   #ifdef ESP32
-    SPIFFS.begin(true);
+    bool ok = SPIFFS.begin(true);
   #elif defined(ESP8266)
-    SPIFFS.begin();
+    bool ok = SPIFFS.begin();
   #endif
+
+  if(!ok) {
+    SPIFFS.format();
+  }
 
   SPIFFS.remove(dataBackupFileName);
 
