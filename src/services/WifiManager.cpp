@@ -15,8 +15,6 @@ void WifiManager::begin(void) {
   digitalWrite(LED_BUILTIN, HIGH);
 
   loadCustomParameters();
-  Serial.println("LOOOOOOOOOOOAAAAAAAAAAD");
-  Serial.println(customDeviceName);
   customDeviceNameParameter = AsyncWiFiManagerParameter("device name", "Custom device name e.g. Kitchen Light", customDeviceName.c_str(), 40);
   
   wifiManager.addParameter(&customDeviceNameParameter);
@@ -25,9 +23,6 @@ void WifiManager::begin(void) {
 
   wifiManager.autoConnect("Webthings Setup", "password");
   while (WiFi.status() != WL_CONNECTED);
-
-  Serial.println("CONENEEEEEECT");
-  Serial.println(customDeviceName);
   
   String hostName = "Webthings Device";
   if (!customDeviceName.equals("")) {
@@ -100,9 +95,6 @@ void WifiManager::saveCustomParameters(void) {
 
   customDeviceName = customDeviceNameParameter.getValue();
   doc["customDeviceName"] = customDeviceNameParameter.getValue();
-
-  Serial.println("SAAAAAAAAAAAAAAAAAAVE");
-  Serial.println(customDeviceName);
 
   // Serialize JSON to file
   if (serializeJson(doc, file) == 0) {
