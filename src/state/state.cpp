@@ -3,7 +3,7 @@
 #define dataBackupFileName "/dataBackup.json"
 #define dataBackupFileSize 512
 
-Incendio::State Incendio::StateManager::load() {
+void Incendio::State::load() {
   #ifdef ESP32
     bool ok = SPIFFS.begin(true);
   #elif defined(ESP8266)
@@ -23,22 +23,18 @@ Incendio::State Incendio::StateManager::load() {
     Serial.println(F("Failed to read file, using default state"));
   }
 
-  Incendio::State state;
-
-  state.lastOn = doc["lastOn"] | false;
-  state.lastBrightness = doc["lastBrightness"] | 100.0f;
-  state.lastColor = doc["lastColor"] | "#ffffff";
-  state.lastColorMode = doc["lastColorMode"] | "temperature";
-  state.lastColorTemperature = doc["lastColorTemperature"] | 2700;
+  Incendio::State::on = doc["on"] | false;
+  Incendio::State::brightness = doc["brightness"] | 100.0f;
+  Incendio::State::color = doc["color"] | "#ffffff";
+  Incendio::State::colorMode = doc["colorMode"] | "temperature";
+  Incendio::State::colorTemperature = doc["colorTemperature"] | 2700;
 
   file.close();
 
   SPIFFS.end();
-
-  return state;
 }
 
-void Incendio::StateManager::save(Incendio::State state) {
+void Incendio::State::save() {
   #ifdef ESP32
     bool ok = SPIFFS.begin(true);
   #elif defined(ESP8266)
@@ -59,11 +55,11 @@ void Incendio::StateManager::save(Incendio::State state) {
 
   StaticJsonDocument<dataBackupFileSize> doc;
 
-  doc["lastOn"] = state.lastOn;
-  doc["lastBrightness"] = state.lastBrightness;
-  doc["lastColor"] = state.lastColor;
-  doc["lastColorMode"] = state.lastColorMode;
-  doc["lastColorTemperature"] = state.lastColorTemperature;
+  doc["lastOn"] = Incendio::State::on;
+  doc["lastBrightness"] = Incendio::State::brightness;
+  doc["lastColor"] = Incendio::State::color;
+  doc["lastColorMode"] = Incendio::State::colorMode;
+  doc["lastColorTemperature"] = Incendio::State::colorTemperature;
 
   // Serialize JSON to file
   if (serializeJson(doc, file) == 0) {

@@ -14,18 +14,17 @@
 #endif
 
 namespace Incendio {
-  struct State {
-    bool lastOn;
-    float lastBrightness;
-    String lastColor;
-    String lastColorMode;
-    int lastColorTemperature;
-  };
-
-  class StateManager {
+  class State {
     public:
-      static State load(void);
-      static void save(State state);
+      static bool on;
+      static float brightness;
+      static String color;
+      static String colorMode;
+      static int colorTemperature;
+
+    public:
+      static void load(void);
+      static void save(void);
   };
 }
 
