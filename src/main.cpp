@@ -14,15 +14,6 @@
 
 WebThingAdapter *adapter;
 
-const char *deviceTypes[] = {"OnOffSwitch", "Light", "ColorControl", nullptr};
-ThingDevice device("lightstrip", "Lightstrip", deviceTypes);
-
-ThingProperty deviceOn("on", "Whether the led is turned on", BOOLEAN, "OnOffProperty");
-ThingProperty deviceBrightness("brithgness", "The brithgness of light from 0-100", NUMBER, "BrightnessProperty");
-ThingProperty deviceColor("color", "The color of light in RGB", STRING, "ColorProperty");
-ThingProperty deviceColorMode("colorMode", "The color mode of light", STRING, "ColorModeProperty");
-ThingProperty deviceColorTemperature("colorTemperature", "The color temperature of light", INTEGER, "ColorTemperatureProperty");
-
 String color = "#ffffff";
 const char * colorModeEnum[3] = {"color", "temperature", nullptr};
 String colorMode = colorModeEnum[0];
@@ -52,52 +43,49 @@ void setup(void) {
   Incendio::Wifi::begin();
   Incendio::OTA::begin();
   Incendio::State::load();
-
-  String customDeviceName = Incendio::Wifi::getCustomDeviceName();
-  if (!customDeviceName.equals("")) {
-    device.title = customDeviceName;
-  }
+  Incendio::Config::load();
+  Incendio::Device::load();
 
   setupLamp();
 
   adapter = new WebThingAdapter("lasse-lightstrip-adapter", WiFi.localIP(), 443);
   
-  device.addProperty(&deviceOn);
+  Incendio::Device::device.addProperty(&Incendio::Device::deviceOn);
   ThingPropertyValue onValue;
   onValue.boolean = Incendio::State::on;
-  deviceOn.setValue(onValue);
+  Incendio::Device::deviceOn.setValue(onValue);
 
-  device.addProperty(&deviceBrightness);
+  Incendio::Device::device.addProperty(&Incendio::Device::deviceBrightness);
   ThingPropertyValue brightnessValue;
   brightnessValue.number = Incendio::State::brightness;
-  deviceBrightness.setValue(brightnessValue);
+  Incendio::Device::deviceBrightness.setValue(brightnessValue);
 
-  device.addProperty(&deviceColor);
+  Incendio::Device::device.addProperty(&Incendio::Device::deviceColor);
   ThingPropertyValue colorValue;
   colorValue.string = &color;
-  deviceColor.setValue(colorValue);
+  Incendio::Device::deviceColor.setValue(colorValue);
 
-  deviceColorMode.propertyEnum = colorModeEnum;
-  device.addProperty(&deviceColorMode);
+  Incendio::Device::deviceColorMode.propertyEnum = colorModeEnum;
+  Incendio::Device::device.addProperty(&Incendio::Device::deviceColorMode);
   ThingPropertyValue colorModeValue;
   colorModeValue.string = &colorMode;
-  deviceColorMode.setValue(colorModeValue);
+  Incendio::Device::deviceColorMode.setValue(colorModeValue);
 
-  deviceColorTemperature.minimum = 1700;
-  deviceColorTemperature.maximum = 6500;
-  device.addProperty(&deviceColorTemperature);
+  Incendio::Device::deviceColorTemperature.minimum = 1700;
+  Incendio::Device::deviceColorTemperature.maximum = 6500;
+  Incendio::Device::device.addProperty(&Incendio::Device::deviceColorTemperature);
   ThingPropertyValue colorTemperatureValue;
   colorTemperatureValue.integer = Incendio::State::colorTemperature;
-  deviceColorTemperature.setValue(colorTemperatureValue);
+  Incendio::Device::deviceColorTemperature.setValue(colorTemperatureValue);
 
-  adapter->addDevice(&device);
+  adapter->addDevice(&Incendio::Device::device);
 
   adapter->begin();
   Serial.println("Webthings HTTP server started");
   Serial.print("http://");
   Serial.print(WiFi.localIP());
   Serial.print("/things/");
-  Serial.println(device.id);
+  Serial.println(Incendio::Device::device.id);
 }
 
 void updateColor(String *color, float const brightness) {
@@ -145,9 +133,9 @@ void loop(void) {
 
   adapter->update();
 
-  bool on = deviceOn.getValue().boolean;
-  float brightness = deviceBrightness.getValue().number;
-  int colorTemperature = deviceColorTemperature.getValue().integer;
+  bool on = Incendio::Device::deviceOn.getValue().boolean;
+  float brightness = Incendio::Device::deviceBrightness.getValue().number;
+  int colorTemperature = Incendio::Device::deviceColorTemperature.getValue().integer;
   if (colorMode.compareTo("color")) {
     updateColor(&color, on ? brightness : 0);
   } else if (colorMode.compareTo("temperature")) {
@@ -158,7 +146,7 @@ void loop(void) {
   
   // On or off
   if (on != Incendio::State::on) {
-    Serial.print(device.id);
+    Serial.print(Incendio::Device::device.id);
     Serial.print(": on: ");
     Serial.println(on);
 
@@ -168,7 +156,7 @@ void loop(void) {
 
   // Brightness
   if (brightness != Incendio::State::brightness) {
-    Serial.print(device.id);
+    Serial.print(Incendio::Device::device.id);
     Serial.print(", brightness: ");
     Serial.println(brightness);
 
@@ -178,7 +166,7 @@ void loop(void) {
 
   // Color
   if (!color.equals(Incendio::State::color)) {
-    Serial.print(device.id);
+    Serial.print(Incendio::Device::device.id);
     Serial.print(", color: ");
     Serial.println(color);
 
@@ -189,7 +177,7 @@ void loop(void) {
 
   // Color Mode
   if (!colorMode.equals(Incendio::State::colorMode)) {
-    Serial.print(device.id);
+    Serial.print(Incendio::Device::device.id);
     Serial.print(", colorMode: ");
     Serial.println(colorMode);
 
@@ -199,7 +187,7 @@ void loop(void) {
 
   // Color Temperature
   if (colorTemperature != Incendio::State::colorTemperature) {
-    Serial.print(device.id);
+    Serial.print(Incendio::Device::device.id);
     Serial.print(", colorTemperature: ");
     Serial.println(colorTemperature);
 

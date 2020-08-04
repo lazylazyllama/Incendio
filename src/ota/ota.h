@@ -1,5 +1,5 @@
-#ifndef LUXIO_OTA_H
-#define LUXIO_OTA_H
+#ifndef INCENDIO_OTA_H
+#define INCENDIO_OTA_H
 
 #include <ArduinoOTA.h>
 
@@ -11,4 +11,4 @@ namespace Incendio {
   };
 }
 
-#endif /* LUXIO_OTA_H */
+#endif /* INCENDIO_OTA_H */

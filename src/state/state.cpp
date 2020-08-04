@@ -1,7 +1,7 @@
 #include "state.h"
 
-#define dataBackupFileName "/dataBackup.json"
-#define dataBackupFileSize 512
+#define STATE_FILE_NAME "/state.json"
+#define STATE_FILE_SIZE 512
 
 void Incendio::State::load() {
   #ifdef ESP32
@@ -14,9 +14,9 @@ void Incendio::State::load() {
     SPIFFS.format();
   }
 
-  File file = SPIFFS.open(dataBackupFileName, FILE_READ);
+  File file = SPIFFS.open(STATE_FILE_NAME, FILE_READ);
 
-  StaticJsonDocument<dataBackupFileSize> doc;
+  StaticJsonDocument<STATE_FILE_SIZE> doc;
 
   DeserializationError error = deserializeJson(doc, file);
   if (error) {
@@ -45,15 +45,15 @@ void Incendio::State::save() {
     SPIFFS.format();
   }
 
-  SPIFFS.remove(dataBackupFileName);
+  SPIFFS.remove(STATE_FILE_NAME);
 
-  File file = SPIFFS.open(dataBackupFileName, FILE_WRITE);
+  File file = SPIFFS.open(STATE_FILE_NAME, FILE_WRITE);
   if (!file) {
     Serial.println(F("Failed to create file"));
     return;
   }
 
-  StaticJsonDocument<dataBackupFileSize> doc;
+  StaticJsonDocument<STATE_FILE_SIZE> doc;
 
   doc["lastOn"] = Incendio::State::on;
   doc["lastBrightness"] = Incendio::State::brightness;

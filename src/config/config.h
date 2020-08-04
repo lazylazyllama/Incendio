@@ -1,6 +1,7 @@
-#ifndef INCENDIO_STATE_H
-#define INCENDIO_STATE_H
+#ifndef INCENDIO_CONFIG_H
+#define INCENDIO_CONFIG_H
 
+#include <Arduino.h>
 #include <ArduinoJson.h>
 
 #ifdef ESP32
@@ -13,19 +14,17 @@
   #define FILE_APPEND     "a"
 #endif
 
-namespace Incendio {
-  class State {
-    public:
-      static bool on;
-      static float brightness;
-      static String color;
-      static String colorMode;
-      static int colorTemperature;
+#include "../device/device.h"
 
+namespace Incendio {
+  class Config {
+    public:
+      static String deviceName;
+      static Incendio::DeviceType deviceType;
     public:
       static void load(void);
       static void save(void);
   };
 }
 
-#endif /* INCENDIO_STATE_H */
+#endif /* INCENDIO_CONFIG_H */
