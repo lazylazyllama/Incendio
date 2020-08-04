@@ -3,7 +3,7 @@
 #define dataBackupFileName "/dataBackup.json"
 #define dataBackupFileSize 512
 
-LuxIo::State LuxIo::StateManager::load() {
+Incendio::State Incendio::StateManager::load() {
   #ifdef ESP32
     bool ok = SPIFFS.begin(true);
   #elif defined(ESP8266)
@@ -23,7 +23,7 @@ LuxIo::State LuxIo::StateManager::load() {
     Serial.println(F("Failed to read file, using default state"));
   }
 
-  LuxIo::State state;
+  Incendio::State state;
 
   state.lastOn = doc["lastOn"] | false;
   state.lastBrightness = doc["lastBrightness"] | 100.0f;
@@ -38,7 +38,7 @@ LuxIo::State LuxIo::StateManager::load() {
   return state;
 }
 
-void LuxIo::StateManager::save(LuxIo::State state) {
+void Incendio::StateManager::save(Incendio::State state) {
   #ifdef ESP32
     bool ok = SPIFFS.begin(true);
   #elif defined(ESP8266)

@@ -10,7 +10,7 @@ static AsyncWiFiManager wifiManager(&webServer,&dnsServer);
 String customDeviceName = "";
 AsyncWiFiManagerParameter customDeviceNameParameter("");
 
-void LuxIo::Wifi::begin(void) {
+void Incendio::Wifi::begin(void) {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
 
@@ -41,11 +41,11 @@ void LuxIo::Wifi::begin(void) {
   digitalWrite(LED_BUILTIN, LOW);
 }
 
-String LuxIo::Wifi::getCustomDeviceName(void) {
+String Incendio::Wifi::getCustomDeviceName(void) {
   return customDeviceName;
 }
 
-void LuxIo::Wifi::loadCustomParameters() {
+void Incendio::Wifi::loadCustomParameters() {
   #ifdef ESP32
     bool ok = SPIFFS.begin(true);
   #elif defined(ESP8266)
@@ -72,7 +72,7 @@ void LuxIo::Wifi::loadCustomParameters() {
   SPIFFS.end();
 }
 
-void LuxIo::Wifi::saveCustomParameters(void) {
+void Incendio::Wifi::saveCustomParameters(void) {
   #ifdef ESP32
     bool ok = SPIFFS.begin(true);
   #elif defined(ESP8266)

@@ -27,7 +27,7 @@ String color = "#ffffff";
 const char * colorModeEnum[3] = {"color", "temperature", nullptr};
 String colorMode = colorModeEnum[0];
 
-LuxIo::State data;
+Incendio::State data;
 
 const unsigned char redPin = 12;
 const unsigned char greenPin = 14;
@@ -51,16 +51,16 @@ void setup(void) {
     btStop();
   #endif
 
-  LuxIo::Wifi::begin();
-  LuxIo::OTA::begin();
+  Incendio::Wifi::begin();
+  Incendio::OTA::begin();
 
-  String customDeviceName = LuxIo::Wifi::getCustomDeviceName();
+  String customDeviceName = Incendio::Wifi::getCustomDeviceName();
   if (!customDeviceName.equals("")) {
     device.title = customDeviceName;
   }
 
   setupLamp();
-  data = LuxIo::StateManager::load();
+  data = Incendio::StateManager::load();
 
   adapter = new WebThingAdapter("lasse-lightstrip-adapter", WiFi.localIP(), 443);
   
@@ -143,7 +143,7 @@ void updateWhite(float const brightness) {
 }
 
 void loop(void) {
-  LuxIo::OTA::handle();
+  Incendio::OTA::handle();
 
   adapter->update();
 
@@ -164,7 +164,7 @@ void loop(void) {
     Serial.println(on);
 
     data.lastOn = on;
-    LuxIo::StateManager::save(data);
+    Incendio::StateManager::save(data);
   }
   if (brightness != data.lastBrightness) {
     Serial.print(device.id);
@@ -172,7 +172,7 @@ void loop(void) {
     Serial.println(brightness);
 
     data.lastBrightness = brightness;
-    LuxIo::StateManager::save(data);
+    Incendio::StateManager::save(data);
   }
   if (!color.equals(data.lastColor)) {
     Serial.print(device.id);
@@ -181,7 +181,7 @@ void loop(void) {
 
     colorMode = colorModeEnum[0]; // colorMode = "color"
     data.lastColor = color;
-    LuxIo::StateManager::save(data);
+    Incendio::StateManager::save(data);
   }
   if (!colorMode.equals(data.lastColorMode)) {
     Serial.print(device.id);
@@ -189,7 +189,7 @@ void loop(void) {
     Serial.println(colorMode);
 
     data.lastColorMode = colorMode;
-    LuxIo::StateManager::save(data);
+    Incendio::StateManager::save(data);
   }
   if (colorTemperature != data.lastColorTemperature) {
     Serial.print(device.id);
@@ -198,6 +198,6 @@ void loop(void) {
 
     colorMode = colorModeEnum[1]; // colorMode = "temperature"
     data.lastColorTemperature = colorTemperature;
-    LuxIo::StateManager::save(data);
+    Incendio::StateManager::save(data);
   }
 }

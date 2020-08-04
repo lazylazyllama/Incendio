@@ -1,6 +1,6 @@
 #include "ota.h"
 
-void LuxIo::OTA::begin(void) {
+void Incendio::OTA::begin(void) {
   ArduinoOTA.setHostname("lasse-lightstrip");
 
   ArduinoOTA.onStart([]() {
@@ -23,6 +23,6 @@ void LuxIo::OTA::begin(void) {
   ArduinoOTA.begin();
 }
 
-void LuxIo::OTA::handle(void) {
+void Incendio::OTA::handle(void) {
   ArduinoOTA.handle();
 }

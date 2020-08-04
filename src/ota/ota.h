@@ -3,7 +3,7 @@
 
 #include <ArduinoOTA.h>
 
-namespace LuxIo {
+namespace Incendio {
   class OTA {
     public:
       static void begin(void);

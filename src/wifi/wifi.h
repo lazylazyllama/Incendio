@@ -21,7 +21,7 @@
   #define FILE_APPEND     "a"
 #endif
 
-namespace LuxIo {
+namespace Incendio {
     class Wifi {
     public:
         static void begin(void);

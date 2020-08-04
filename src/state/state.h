@@ -13,7 +13,7 @@
   #define FILE_APPEND     "a"
 #endif
 
-namespace LuxIo {
+namespace Incendio {
   struct State {
     bool lastOn;
     float lastBrightness;
