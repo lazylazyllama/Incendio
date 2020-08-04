@@ -13,18 +13,20 @@
   #define FILE_APPEND     "a"
 #endif
 
-struct ConfigData {
-  bool lastOn;
-  float lastBrightness;
-  String lastColor;
-  String lastColorMode;
-  int lastColorTemperature;
-};
+namespace LuxIo {
+  struct State {
+    bool lastOn;
+    float lastBrightness;
+    String lastColor;
+    String lastColorMode;
+    int lastColorTemperature;
+  };
 
-class ConfigManager {
-  public:
-    static ConfigData load(void);
-    static void save(ConfigData configData);
-};
+  class StateManager {
+    public:
+      static State load(void);
+      static void save(State state);
+  };
+}
 
 #endif /* CONFIG_MANAGER_H */

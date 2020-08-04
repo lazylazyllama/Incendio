@@ -1,4 +1,4 @@
-#include "WifiManager.h"
+#include "wifi.h"
 
 #define wifiBackupFileName "/wifiBackup.json"
 #define wifiBackupFileSize 512
@@ -10,7 +10,7 @@ static AsyncWiFiManager wifiManager(&webServer,&dnsServer);
 String customDeviceName = "";
 AsyncWiFiManagerParameter customDeviceNameParameter("");
 
-void WifiManager::begin(void) {
+void LuxIo::Wifi::begin(void) {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
 
@@ -41,11 +41,11 @@ void WifiManager::begin(void) {
   digitalWrite(LED_BUILTIN, LOW);
 }
 
-String WifiManager::getCustomDeviceName(void) {
+String LuxIo::Wifi::getCustomDeviceName(void) {
   return customDeviceName;
 }
 
-void WifiManager::loadCustomParameters() {
+void LuxIo::Wifi::loadCustomParameters() {
   #ifdef ESP32
     bool ok = SPIFFS.begin(true);
   #elif defined(ESP8266)
@@ -72,7 +72,7 @@ void WifiManager::loadCustomParameters() {
   SPIFFS.end();
 }
 
-void WifiManager::saveCustomParameters(void) {
+void LuxIo::Wifi::saveCustomParameters(void) {
   #ifdef ESP32
     bool ok = SPIFFS.begin(true);
   #elif defined(ESP8266)

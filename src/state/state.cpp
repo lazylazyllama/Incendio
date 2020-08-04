@@ -1,9 +1,9 @@
-#include "ConfigManager.h"
+#include "state.h"
 
 #define dataBackupFileName "/dataBackup.json"
 #define dataBackupFileSize 512
 
-ConfigData ConfigManager::load() {
+LuxIo::State LuxIo::StateManager::load() {
   #ifdef ESP32
     bool ok = SPIFFS.begin(true);
   #elif defined(ESP8266)
@@ -20,25 +20,25 @@ ConfigData ConfigManager::load() {
 
   DeserializationError error = deserializeJson(doc, file);
   if (error) {
-    Serial.println(F("Failed to read file, using default configuration"));
+    Serial.println(F("Failed to read file, using default state"));
   }
 
-  ConfigData configData;
+  LuxIo::State state;
 
-  configData.lastOn = doc["lastOn"] | false;
-  configData.lastBrightness = doc["lastBrightness"] | 100.0f;
-  configData.lastColor = doc["lastColor"] | "#ffffff";
-  configData.lastColorMode = doc["lastColorMode"] | "temperature";
-  configData.lastColorTemperature = doc["lastColorTemperature"] | 2700;
+  state.lastOn = doc["lastOn"] | false;
+  state.lastBrightness = doc["lastBrightness"] | 100.0f;
+  state.lastColor = doc["lastColor"] | "#ffffff";
+  state.lastColorMode = doc["lastColorMode"] | "temperature";
+  state.lastColorTemperature = doc["lastColorTemperature"] | 2700;
 
   file.close();
 
   SPIFFS.end();
 
-  return configData;
+  return state;
 }
 
-void ConfigManager::save(ConfigData configData) {
+void LuxIo::StateManager::save(LuxIo::State state) {
   #ifdef ESP32
     bool ok = SPIFFS.begin(true);
   #elif defined(ESP8266)
@@ -59,11 +59,11 @@ void ConfigManager::save(ConfigData configData) {
 
   StaticJsonDocument<dataBackupFileSize> doc;
 
-  doc["lastOn"] = configData.lastOn;
-  doc["lastBrightness"] = configData.lastBrightness;
-  doc["lastColor"] = configData.lastColor;
-  doc["lastColorMode"] = configData.lastColorMode;
-  doc["lastColorTemperature"] = configData.lastColorTemperature;
+  doc["lastOn"] = state.lastOn;
+  doc["lastBrightness"] = state.lastBrightness;
+  doc["lastColor"] = state.lastColor;
+  doc["lastColorMode"] = state.lastColorMode;
+  doc["lastColorTemperature"] = state.lastColorTemperature;
 
   // Serialize JSON to file
   if (serializeJson(doc, file) == 0) {
