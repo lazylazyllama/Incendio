@@ -1,7 +1,10 @@
-#include "config.h"
+#include "config.hpp"
 
 #define CONFIG_FILE_NAME "/config.json"
 #define CONFIG_FILE_SIZE 512
+
+String Incendio::Config::deviceName = "sdf";
+Incendio::DeviceType Incendio::Config::deviceType = DeviceType::UNDEFINED;
 
 void Incendio::Config::load() {
   #ifdef ESP32

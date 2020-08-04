@@ -1,4 +1,4 @@
-#include "wifi.h"
+#include "wifi.hpp"
 
 static AsyncWebServer webServer(80);
 static DNSServer dnsServer;

@@ -6,7 +6,7 @@
 #include <ESPAsyncWebServer.h>
 #include <ESPAsyncWiFiManager.h>
 
-#include "config/config.h"
+#include "config/config.hpp"
 
 namespace Incendio {
   class Wifi {

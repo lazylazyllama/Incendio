@@ -21,6 +21,9 @@ namespace Incendio {
       static String color;
       static String colorMode;
       static int colorTemperature;
+      static bool up;
+      static bool down;
+      static bool stop;
 
     public:
       static void load(void);

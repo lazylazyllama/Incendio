@@ -1,4 +1,4 @@
-#include "ota.h"
+#include "ota.hpp"
 
 void Incendio::OTA::begin(void) {
   ArduinoOTA.setHostname("lasse-lightstrip");
