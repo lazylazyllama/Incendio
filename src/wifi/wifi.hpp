@@ -2,7 +2,9 @@
 #define INCENDIO_WIFI_H
 
 #include <Arduino.h>
-#include <esp_wifi.h>
+#ifdef ESP32
+  #include <esp_wifi.h>
+#endif
 #include <ESPAsyncWebServer.h>
 #include <ESPAsyncWiFiManager.h>
 

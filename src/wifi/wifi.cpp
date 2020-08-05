@@ -25,12 +25,14 @@ void Incendio::Wifi::begin(void) {
   if (!Incendio::Config::deviceName.equals("")) {
     hostName.concat(": ");
     hostName.concat(Incendio::Config::deviceName);
-  }
-  WiFi.setHostname(hostName.c_str());
+  }  
+  
   #ifdef ESP32
+    WiFi.setHostname(hostName.c_str());
     esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
     WiFi.setSleep(true); //this would use WIFI_PS_MIN_MODEM
   #elif defined(ESP8266)
+    WiFi.hostname(hostName.c_str());
     WiFi.setSleepMode(WIFI_MODEM_SLEEP);
     WiFi.forceSleepBegin();
   #endif
