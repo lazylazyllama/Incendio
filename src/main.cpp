@@ -26,7 +26,7 @@ void setup(void) {
   Incendio::State::load();
   Incendio::Config::load();
 
-  adapter = new WebThingAdapter("lasse-lightstrip-adapter", WiFi.localIP(), 443);
+  adapter = new WebThingAdapter("incendio-adapter", WiFi.localIP(), 443);
   device = new Incendio::RollerShutter();
 
   adapter->addDevice(&device->device);
