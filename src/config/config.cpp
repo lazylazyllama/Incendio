@@ -7,17 +7,13 @@ String Incendio::Config::deviceName = "sdf";
 Incendio::DeviceType Incendio::Config::deviceType = DeviceType::UNDEFINED;
 
 void Incendio::Config::load() {
-  #ifdef ESP32
-    bool ok = SPIFFS.begin(true);
-  #elif defined(ESP8266)
-    bool ok = SPIFFS.begin();
-  #endif
+  bool ok = StorageFS.begin();
 
   if(!ok) {
-    SPIFFS.format();
+    StorageFS.format();
   }
 
-  File file = SPIFFS.open(CONFIG_FILE_NAME, FILE_READ);
+  File file = StorageFS.open(CONFIG_FILE_NAME, FILE_READ);
 
   StaticJsonDocument<CONFIG_FILE_SIZE> doc;
 
@@ -31,23 +27,19 @@ void Incendio::Config::load() {
 
   file.close();
 
-  SPIFFS.end();
+  StorageFS.end();
 }
 
 void Incendio::Config::save() {
-  #ifdef ESP32
-    bool ok = SPIFFS.begin(true);
-  #elif defined(ESP8266)
-    bool ok = SPIFFS.begin();
-  #endif
+  bool ok = StorageFS.begin();
 
   if(!ok) {
-    SPIFFS.format();
+    StorageFS.format();
   }
 
-  SPIFFS.remove(CONFIG_FILE_NAME);
+  StorageFS.remove(CONFIG_FILE_NAME);
 
-  File file = SPIFFS.open(CONFIG_FILE_NAME, FILE_WRITE);
+  File file = StorageFS.open(CONFIG_FILE_NAME, FILE_WRITE);
   if (!file) {
     Serial.println(F("Failed to create file"));
     return;
@@ -66,5 +58,5 @@ void Incendio::Config::save() {
   // Close the file
   file.close();
 
-  SPIFFS.end();
+  StorageFS.end();
 }

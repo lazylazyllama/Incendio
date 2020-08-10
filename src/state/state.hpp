@@ -2,16 +2,7 @@
 #define INCENDIO_STATE_H
 
 #include <ArduinoJson.h>
-
-#ifdef ESP32
-  #include <SPIFFS.h>
-#elif defined(ESP8266)
-  #include <SPI.h>
-  #include <FS.h>
-  #define FILE_READ       "r"
-  #define FILE_WRITE      "w"
-  #define FILE_APPEND     "a"
-#endif
+#include "../storageFS/storageFS.hpp"
 
 namespace Incendio {
   class State {

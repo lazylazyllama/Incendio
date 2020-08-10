@@ -13,17 +13,13 @@ bool Incendio::State::down = false;
 bool Incendio::State::stop = true;
 
 void Incendio::State::load() {
-  #ifdef ESP32
-    bool ok = SPIFFS.begin(true);
-  #elif defined(ESP8266)
-    bool ok = SPIFFS.begin();
-  #endif
+  bool ok = StorageFS.begin();
 
   if(!ok) {
-    SPIFFS.format();
+    StorageFS.format();
   }
 
-  File file = SPIFFS.open(STATE_FILE_NAME, FILE_READ);
+  File file = StorageFS.open(STATE_FILE_NAME, FILE_READ);
 
   StaticJsonDocument<STATE_FILE_SIZE> doc;
 
@@ -43,23 +39,19 @@ void Incendio::State::load() {
 
   file.close();
 
-  SPIFFS.end();
+  StorageFS.end();
 }
 
 void Incendio::State::save() {
-  #ifdef ESP32
-    bool ok = SPIFFS.begin(true);
-  #elif defined(ESP8266)
-    bool ok = SPIFFS.begin();
-  #endif
+  bool ok = StorageFS.begin();
 
   if(!ok) {
-    SPIFFS.format();
+    StorageFS.format();
   }
 
-  SPIFFS.remove(STATE_FILE_NAME);
+  StorageFS.remove(STATE_FILE_NAME);
 
-  File file = SPIFFS.open(STATE_FILE_NAME, FILE_WRITE);
+  File file = StorageFS.open(STATE_FILE_NAME, FILE_WRITE);
   if (!file) {
     Serial.println(F("Failed to create file"));
     return;
@@ -84,5 +76,5 @@ void Incendio::State::save() {
   // Close the file
   file.close();
 
-  SPIFFS.end();
+  StorageFS.end();
 }
