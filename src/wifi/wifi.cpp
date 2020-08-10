@@ -26,9 +26,6 @@ void Incendio::Wifi::begin(void) {
     hostName.concat(": ");
     hostName.concat(Incendio::Config::deviceName);
   }
-
-  Serial.println("LOL");
-  Serial.println(WiFi.localIP());
   
   #ifdef ESP32
     WiFi.setHostname(hostName.c_str());
@@ -39,8 +36,6 @@ void Incendio::Wifi::begin(void) {
     WiFi.setSleepMode(WIFI_MODEM_SLEEP);
     WiFi.forceSleepBegin(); */
   #endif
-  Serial.println("LOL");
-  Serial.println(WiFi.localIP());
   
   digitalWrite(LED_BUILTIN, LOW);
 }
