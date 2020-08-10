@@ -15,6 +15,8 @@
 WebThingAdapter* adapter;
 Incendio::Device* device;
 
+const int port = 443;
+
 void setup(void) {
   Serial.begin(115200);
   #ifdef ESP32
@@ -26,7 +28,7 @@ void setup(void) {
   Incendio::State::load();
   Incendio::Config::load();
 
-  adapter = new WebThingAdapter("incendio-adapter", WiFi.localIP(), 443);
+  adapter = new WebThingAdapter("incendio-adapter", WiFi.localIP(), port);
   device = new Incendio::RollerShutter();
 
   adapter->addDevice(&device->device);
@@ -35,6 +37,8 @@ void setup(void) {
   Serial.println("Webthings HTTP server started");
   Serial.print("http://");
   Serial.print(WiFi.localIP());
+  Serial.print(":");
+  Serial.print(port);
   Serial.print("/things/");
   Serial.println(device->device.id);
 }
