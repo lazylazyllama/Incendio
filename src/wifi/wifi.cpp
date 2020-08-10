@@ -25,17 +25,22 @@ void Incendio::Wifi::begin(void) {
   if (!Incendio::Config::deviceName.equals("")) {
     hostName.concat(": ");
     hostName.concat(Incendio::Config::deviceName);
-  }  
+  }
+
+  Serial.println("LOL");
+  Serial.println(WiFi.localIP());
   
   #ifdef ESP32
     WiFi.setHostname(hostName.c_str());
     esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
     WiFi.setSleep(true); //this would use WIFI_PS_MIN_MODEM
   #elif defined(ESP8266)
-    WiFi.hostname(hostName.c_str());
+    /* WiFi.hostname(hostName.c_str());
     WiFi.setSleepMode(WIFI_MODEM_SLEEP);
-    WiFi.forceSleepBegin();
+    WiFi.forceSleepBegin(); */
   #endif
+  Serial.println("LOL");
+  Serial.println(WiFi.localIP());
   
   digitalWrite(LED_BUILTIN, LOW);
 }
