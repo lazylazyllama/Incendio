@@ -9,10 +9,10 @@
 
 namespace Incendio {
   class RollerShutter : public Incendio::Device {
-    private:
-      ThingProperty stopProperty;
-      ThingProperty upProperty;
-      ThingProperty downProperty;
+    private:      
+      ThingAction stopAction;
+      ThingAction upAction;
+      ThingAction downAction;
 
     public:
       RollerShutter(void);

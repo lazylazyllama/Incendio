@@ -20,7 +20,7 @@ namespace Incendio {
       ThingDevice device;
 
     public:
-      Device(const char **deviceTypes) : device("incendio-device", "Incendio Device", deviceTypes) {};
+      Device(const char *title, const char **deviceTypes) : device("incendio-device", title, deviceTypes) {};
       virtual void handle(void) = 0;
   };
 }

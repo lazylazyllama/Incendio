@@ -8,9 +8,6 @@ float Incendio::State::brightness = 100.0f;
 String Incendio::State::color = "#ffffff";
 String Incendio::State::colorMode = "temperature";
 int Incendio::State::colorTemperature = 2700;
-bool Incendio::State::up = false;
-bool Incendio::State::down = false;
-bool Incendio::State::stop = true;
 
 void Incendio::State::load() {
   bool ok = StorageFS.begin();
@@ -33,9 +30,6 @@ void Incendio::State::load() {
   Incendio::State::color = doc["color"] | "#ffffff";
   Incendio::State::colorMode = doc["colorMode"] | "temperature";
   Incendio::State::colorTemperature = doc["colorTemperature"] | 2700;
-  Incendio::State::up = doc["up"] | false;
-  Incendio::State::down = doc["down"] | false;
-  Incendio::State::stop = doc["stop"] | true;
 
   file.close();
 
@@ -64,9 +58,6 @@ void Incendio::State::save() {
   doc["lastColor"] = Incendio::State::color;
   doc["lastColorMode"] = Incendio::State::colorMode;
   doc["lastColorTemperature"] = Incendio::State::colorTemperature;
-  doc["up"] = Incendio::State::up;
-  doc["down"] = Incendio::State::down;
-  doc["stop"] = Incendio::State::stop;
 
   // Serialize JSON to file
   if (serializeJson(doc, file) == 0) {

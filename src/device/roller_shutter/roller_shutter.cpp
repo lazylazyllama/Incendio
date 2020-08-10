@@ -2,124 +2,92 @@
 
 const unsigned char upOutputPin = 4;
 const unsigned char downOutputPin = 15;
-const unsigned char upButtonPin = 13;
-const unsigned char downButtonPin = 5;
+const unsigned char upInputPin = 13;
+const unsigned char downInputPin = 5;
 
 const char *deviceTypesRollerShutter[] = { nullptr };
 
+void hardwareButtonChangedISR() {
+  if (digitalRead(upInputPin) == HIGH && digitalRead(downInputPin) == HIGH) {
+    Serial.println("Both input pins HIGH => STOP");
+    digitalWrite(upOutputPin, LOW);
+    digitalWrite(downOutputPin, LOW);
+  } else if (digitalRead(upInputPin) == HIGH) {
+    Serial.println("Only up input pin HIGH => DRIVE UP");
+    digitalWrite(upOutputPin, HIGH);
+    digitalWrite(downOutputPin, LOW);
+  } else if (digitalRead(downInputPin) == HIGH) {
+    Serial.println("Only down input pin HIGH => DRIVE DOWN");
+    digitalWrite(upOutputPin, LOW);
+    digitalWrite(downOutputPin, HIGH);
+  }
+}
+
+void do_stop(const JsonVariant &input) {
+  Serial.println("STOP");
+
+  digitalWrite(upOutputPin, LOW);
+  digitalWrite(downOutputPin, LOW);
+
+  digitalWrite(LED_BUILTIN, HIGH);
+}
+
+void do_up(const JsonVariant &input) {
+  Serial.println("UP");
+  
+  digitalWrite(upOutputPin, HIGH);
+  digitalWrite(downOutputPin, LOW);
+
+  digitalWrite(LED_BUILTIN, LOW);
+}
+
+void do_down(const JsonVariant &input) {
+  Serial.println("DOWN");
+  
+  digitalWrite(upOutputPin, LOW);
+  digitalWrite(downOutputPin, HIGH);
+
+  digitalWrite(LED_BUILTIN, LOW);
+}
+
+ThingActionObject *stop_action_generator(DynamicJsonDocument *input) {
+  return new ThingActionObject("stop", input, do_stop, nullptr);
+}
+
+ThingActionObject *up_action_generator(DynamicJsonDocument *input) {
+  return new ThingActionObject("up", input, do_up, nullptr);
+}
+
+ThingActionObject *down_action_generator(DynamicJsonDocument *input) {
+  return new ThingActionObject("down", input, do_down, nullptr);
+}
+
 Incendio::RollerShutter::RollerShutter(void)
-  : Device(deviceTypesRollerShutter),
-    stopProperty("stop", "Whether the shutter drives up", BOOLEAN, "OnOffProperty"),
-    upProperty("up", "Whether the shutter drives up", BOOLEAN, "OnOffProperty"),
-    downProperty("down", "Whether the shutter drives up", BOOLEAN, "OnOffProperty") {
+  : Device("Roller Shutter", deviceTypesRollerShutter),
+    stopAction("stop", "Stop", "Whether the shutter stops driving", "ToggleAction", nullptr, stop_action_generator),
+    upAction("up", "Up", "Whether the shutter drives up", "ToggleAction", nullptr, up_action_generator),
+    downAction("down", "Down", "Whether the shutter drives down", "ToggleAction", nullptr, down_action_generator) {
 
+  // Add actions
+  device.addAction(&stopAction);
+  device.addAction(&upAction);
+  device.addAction(&downAction);
 
-  device.addProperty(&stopProperty);
-  ThingPropertyValue stopValue;
-  stopValue.boolean = State::stop;
-  stopProperty.setValue(stopValue);
-  stopProperty.title = "Stop";
-
-  device.addProperty(&upProperty);
-  ThingPropertyValue upValue;
-  upValue.boolean = State::up;
-  upProperty.setValue(upValue);
-  upProperty.title = "Up";
-
-  device.addProperty(&downProperty);
-  ThingPropertyValue downValue;
-  downValue.boolean = State::down;
-  downProperty.setValue(downValue);
-  downProperty.title = "Down";
-
+  // Init pins
   pinMode(upOutputPin, OUTPUT);
   digitalWrite(upOutputPin, LOW);
+
   pinMode(downOutputPin, OUTPUT);
   digitalWrite(downOutputPin, LOW);
-  pinMode(upButtonPin, INPUT);
-  pinMode(downButtonPin, INPUT);
+
+  pinMode(upInputPin, INPUT);
+  pinMode(downInputPin, INPUT);
+
+  // Init interrupts
+  attachInterrupt(digitalPinToInterrupt(upInputPin), hardwareButtonChangedISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(downInputPin), hardwareButtonChangedISR, CHANGE);
 };
 
 void Incendio::RollerShutter::handle(void) {
-  bool up = upProperty.getValue().boolean;
-  bool down = downProperty.getValue().boolean;
-  bool stop = stopProperty.getValue().boolean;
-
-  /* if (digitalRead(upButtonPin) == HIGH) {
-    Serial.println("Hardware Button Pressed: Up");
-    if (down) {
-      stop = true;
-    } else {
-      up = true;
-    }
-  } else if (digitalRead(downButtonPin) == HIGH) {
-    Serial.println("Hardware Button Pressed: Down");
-    if (up) {
-      stop = true;
-    } else {
-      down = true;
-    }
-  } */
-
-  if (stop && stop != State::stop) {
-    digitalWrite(upOutputPin, LOW);
-    digitalWrite(downOutputPin, LOW);
-    up = false;
-    down = false;
-  } else if (up && up != State::up) {
-    digitalWrite(downOutputPin, LOW);
-    digitalWrite(upOutputPin, HIGH);
-    down = false;
-    stop = false;
-  } else if (down && down != State::down) {
-    digitalWrite(upOutputPin, LOW);
-    digitalWrite(downOutputPin, HIGH);
-    up = false;
-    stop = false;
-  }
-
-  digitalWrite(LED_BUILTIN, stop ? HIGH : LOW);
-
-  
-  // Stop
-  if (stop != State::stop) {
-    Serial.print(device.id);
-    Serial.print(": stop: ");
-    Serial.println(stop);
-
-    ThingPropertyValue stopValue;
-    stopValue.boolean = stop;
-    stopProperty.setValue(stopValue);
-
-    State::stop = stop;
-    State::save();
-  }
-
-  // Up
-  if (up != State::up) {
-    Serial.print(device.id);
-    Serial.print(": up: ");
-    Serial.println(up);
-
-    ThingPropertyValue upValue;
-    upValue.boolean = up;
-    upProperty.setValue(upValue);
-
-    State::up = up;
-    State::save();
-  }
-
-  // Down
-  if (down != State::down) {
-    Serial.print(device.id);
-    Serial.print(": down: ");
-    Serial.println(down);
-
-    ThingPropertyValue downValue;
-    downValue.boolean = down;
-    downProperty.setValue(downValue);
-
-    State::down = down;
-    State::save();
-  }
+  // Nothing
 }
