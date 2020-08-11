@@ -19,7 +19,7 @@ namespace Incendio {
       ThingProperty temperatureProperty;
 
     public:
-      RollerShutter(void);
+      RollerShutter(const char *title);
       void handle(void) override;
   };
 }

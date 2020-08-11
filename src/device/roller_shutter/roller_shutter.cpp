@@ -88,8 +88,8 @@ ThingActionObject *down_action_generator(DynamicJsonDocument *input) {
   return new ThingActionObject("down", input, do_down, nullptr);
 }
 
-Incendio::RollerShutter::RollerShutter(void)
-  : Device("Roller Shutter", deviceTypesRollerShutter),
+Incendio::RollerShutter::RollerShutter(const char *title)
+  : Device(title, deviceTypesRollerShutter),
     stopAction("stop", "Stop", "Whether the shutter stops driving", "ToggleAction", nullptr, stop_action_generator),
     upAction("up", "Up", "Whether the shutter drives up", "ToggleAction", nullptr, up_action_generator),
     downAction("down", "Down", "Whether the shutter drives down", "ToggleAction", nullptr, down_action_generator),
@@ -136,7 +136,9 @@ void Incendio::RollerShutter::handle(void) {
 
   // TODO handle millis() overflow
   // Stop motor after 1 minute
-  if ((currentMillis - startedDrivingMillis) >= 60000) {
+  if ((currentMillis - startedDrivingMillis) >= 60000 && startedDrivingMillis != 0) {
+    Serial.println("Driving for 1 minute already => STOP");
+    startedDrivingMillis = 0;
     digitalWrite(upOutputPin, LOW);
     digitalWrite(downOutputPin, LOW);
   }

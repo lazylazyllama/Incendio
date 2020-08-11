@@ -24,20 +24,28 @@ void setup(void) {
   #endif
 
   Incendio::Wifi::begin();
-  Serial.println("Vodka 1");
   Incendio::OTA::begin();
-  Serial.println("Vodka 2");
   Incendio::State::load();
-  Serial.println("Vodka 3");
   Incendio::Config::load();
-  Serial.println("Vodka 4");
 
   adapter = new WebThingAdapter("incendio-adapter", WiFi.localIP(), port);
-  device = new Incendio::RollerShutter();
-  Serial.println("Vodka 5");
+  switch (Incendio::Config::deviceType) {
+    case Incendio::DeviceType::UNDEFINED:
+      // TODO Remove this code and replace it with something better
+      device = new Incendio::RollerShutter(Incendio::Config::deviceName.c_str());
+      break;
+
+    case Incendio::DeviceType::RGBW_LIGHTSTRIP:
+      device = new Incendio::RgbwLightstrip(Incendio::Config::deviceName.c_str());
+      break;
+
+    case Incendio::DeviceType::ROLLER_SHUTTER:
+      device = new Incendio::RollerShutter(Incendio::Config::deviceName.c_str());
+      break;
+  }
+  
 
   adapter->addDevice(&device->device);
-  Serial.println("Vodka 6");
 
   adapter->begin();
   Serial.println("Webthings HTTP server started");

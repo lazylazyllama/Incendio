@@ -1,6 +1,6 @@
 #ifndef INCENDIO_WIFI_AP_PASSWORD_H
 #define INCENDIO_WIFI_AP_PASSWORD_H
 
-#define WIFI_AP_PASSWORD "passwords"
+#define WIFI_AP_PASSWORD "password"
 
 #endif /* INCENDIO_WIFI_AP_PASSWORD_H */

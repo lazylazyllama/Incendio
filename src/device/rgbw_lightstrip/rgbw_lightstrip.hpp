@@ -17,7 +17,7 @@ namespace Incendio {
       ThingProperty colorTemperatureProperty;
 
     public:
-      RgbwLightstrip(void);
+      RgbwLightstrip(const char *title);
       void handle(void) override;
 
     private:

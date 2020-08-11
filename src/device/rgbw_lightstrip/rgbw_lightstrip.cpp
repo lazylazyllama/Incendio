@@ -11,8 +11,8 @@ const unsigned char whitePin = 15;
 
 const char *deviceTypesRgbwLightstrip[] = { "OnOffSwitch", "Light", "ColorControl", nullptr };
 
-Incendio::RgbwLightstrip::RgbwLightstrip(void)
-  : Device("RGBW Lightstrip", deviceTypesRgbwLightstrip),
+Incendio::RgbwLightstrip::RgbwLightstrip(const char *title)
+  : Device(title, deviceTypesRgbwLightstrip),
     onProperty("on", "Whether the led is turned on", BOOLEAN, "OnOffProperty"),
     brightnessProperty("brithgness", "The brithgness of light from 0-100", NUMBER, "BrightnessProperty"),
     colorProperty("color", "The color of light in RGB", STRING, "ColorProperty"),
