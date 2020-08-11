@@ -118,43 +118,47 @@ Incendio::RollerShutter::RollerShutter(void)
   attachInterrupt(digitalPinToInterrupt(downInputPin), hardwareButtonChangedISR, CHANGE);
 
   // Init ADE7953 power sensor
-  delay(200);
-  myADE7953.initialize();
+/*   delay(200);
+  myADE7953.initialize(); */
 };
 
 void Incendio::RollerShutter::handle(void) {
-  // Power consumption
-  static float old_activePowerA = 0.0;
-  float activePowerA = myADE7953.getInstActivePowerA();
-  if (true) {
-    old_activePowerA = activePowerA;
+  static unsigned long old_millis = millis();
+  unsigned long new_millis = millis();
+  if ((new_millis - old_millis) >= 10000) {
+    old_millis = new_millis;
 
-    ThingPropertyValue powerValue;
-    powerValue.number = activePowerA;
-    powerProperty.setValue(powerValue);
+    /* // Power consumption
+    static float old_activePowerA = 0.0;
+    float activePowerA = myADE7953.getInstActivePowerA();
+    if (true) {
+      old_activePowerA = activePowerA;
 
-    Serial.print("Update power consumption: ");
-    Serial.print(activePowerA);
-    Serial.println("W");
+      ThingPropertyValue powerValue;
+      powerValue.number = activePowerA;
+      powerProperty.setValue(powerValue);
+
+      Serial.print("Update power consumption: ");
+      Serial.print(activePowerA);
+      Serial.println("W");
+    } */
+
+    // Temperature
+    static int old_adc = 0;
+    int adc = analogRead(A0);
+    if ((adc - old_adc) >= 20 || (adc - old_adc) <= 20) {
+      old_adc = adc;
+      double Rt = (adc * ANALOG_R21) / (1024.0 * ANALOG_V33 - (double)adc);
+      double T = ANALOG_B / (ANALOG_B/ANALOG_T0 + log(Rt/ANALOG_R0));
+      double temp = TO_CELSIUS(T);
+
+      ThingPropertyValue temperatureValue;
+      temperatureValue.number = temp;
+      temperatureProperty.setValue(temperatureValue);
+
+      Serial.print("Update temperature: ");
+      Serial.print(temp);
+      Serial.println("°C");
+    }
   }
-
-  // Temperature
-  static int old_adc = 0;
-  int adc = analogRead(A0);
-  if ((adc - old_adc) >= 20 || (adc - old_adc) <= 20) {
-    old_adc = adc;
-    double Rt = (adc * ANALOG_R21) / (1024.0 * ANALOG_V33 - (double)adc);
-    double T = ANALOG_B / (ANALOG_B/ANALOG_T0 + log(Rt/ANALOG_R0));
-    double temp = TO_CELSIUS(T);
-
-    ThingPropertyValue temperatureValue;
-    temperatureValue.number = temp;
-    temperatureProperty.setValue(temperatureValue);
-
-    Serial.print("Update temperature: ");
-    Serial.print(temp);
-    Serial.println("°C");
-  }
-
-  delay(200);
 }

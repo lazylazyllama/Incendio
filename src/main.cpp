@@ -24,14 +24,20 @@ void setup(void) {
   #endif
 
   Incendio::Wifi::begin();
+  Serial.println("Vodka 1");
   Incendio::OTA::begin();
+  Serial.println("Vodka 2");
   Incendio::State::load();
+  Serial.println("Vodka 3");
   Incendio::Config::load();
+  Serial.println("Vodka 4");
 
   adapter = new WebThingAdapter("incendio-adapter", WiFi.localIP(), port);
   device = new Incendio::RollerShutter();
+  Serial.println("Vodka 5");
 
   adapter->addDevice(&device->device);
+  Serial.println("Vodka 6");
 
   adapter->begin();
   Serial.println("Webthings HTTP server started");
