@@ -5,6 +5,9 @@ const unsigned char downOutputPin = 15;
 const unsigned char upInputPin = 13;
 const unsigned char downInputPin = 5;
 
+// Init motor timer
+unsigned long startedDrivingMillis = 0;
+
 // Define I2C pins for power consumption sensor
 #define local_CLK 14
 #define local_CS 12
@@ -31,12 +34,18 @@ void ICACHE_RAM_ATTR hardwareButtonChangedISR() {
     digitalWrite(downOutputPin, LOW);
   } else if (digitalRead(upInputPin) == HIGH) {
     Serial.println("Only up input pin HIGH => DRIVE UP");
+    startedDrivingMillis = millis();
     digitalWrite(upOutputPin, HIGH);
     digitalWrite(downOutputPin, LOW);
   } else if (digitalRead(downInputPin) == HIGH) {
     Serial.println("Only down input pin HIGH => DRIVE DOWN");
+    startedDrivingMillis = millis();
     digitalWrite(upOutputPin, LOW);
     digitalWrite(downOutputPin, HIGH);
+  } else {
+    Serial.println("Both input pins LOW => STOP");
+    digitalWrite(upOutputPin, LOW);
+    digitalWrite(downOutputPin, LOW);
   }
 }
 
@@ -118,15 +127,24 @@ Incendio::RollerShutter::RollerShutter(void)
   attachInterrupt(digitalPinToInterrupt(downInputPin), hardwareButtonChangedISR, CHANGE);
 
   // Init ADE7953 power sensor
-/*   delay(200);
+  /* delay(200);
   myADE7953.initialize(); */
 };
 
 void Incendio::RollerShutter::handle(void) {
-  static unsigned long old_millis = millis();
-  unsigned long new_millis = millis();
-  if ((new_millis - old_millis) >= 10000) {
-    old_millis = new_millis;
+  unsigned long currentMillis = millis();
+
+  // TODO handle millis() overflow
+  // Stop motor after 1 minute
+  if ((currentMillis - startedDrivingMillis) >= 60000) {
+    digitalWrite(upOutputPin, LOW);
+    digitalWrite(downOutputPin, LOW);
+  }
+
+  // Only update sensors all 10 seconds
+  static unsigned long last10sMillis = millis();
+  if ((currentMillis - last10sMillis) >= 10000) {
+    last10sMillis = currentMillis;
 
     /* // Power consumption
     static float old_activePowerA = 0.0;

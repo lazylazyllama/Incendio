@@ -8,6 +8,8 @@
 #include <ESPAsyncWebServer.h>
 #include <ESPAsyncWiFiManager.h>
 
+#include "wifi_ap_password.hpp"
+
 #include "config/config.hpp"
 
 namespace Incendio {

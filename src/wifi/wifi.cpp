@@ -18,7 +18,7 @@ void Incendio::Wifi::begin(void) {
   wifiManager.setCustomHeadElement(HTTP_CUSTOM_STYLE);
   wifiManager.setSaveConfigCallback(saveCustomParameters);
 
-  wifiManager.autoConnect("Webthings Setup", "password");
+  wifiManager.autoConnect("Webthings Device Setup", WIFI_AP_PASSWORD);
   while (WiFi.status() != WL_CONNECTED);
   
   String hostName = "Webthings Device";
