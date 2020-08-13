@@ -27,53 +27,54 @@ ADE7953 myADE7953(local_CLK, local_CS);
 // Webthings device types
 const char *deviceTypesRollerShutter[] = { nullptr };
 
+enum DrivingMode {
+  STOP, UP, DOWN
+};
+
+void setDrivingMode(DrivingMode mode) {
+  switch (mode) {
+    case DrivingMode::STOP:
+      Serial.println("Driving Mode => STOP");
+      digitalWrite(upOutputPin, LOW);
+      digitalWrite(downOutputPin, LOW);
+      break;
+    case DrivingMode::UP:
+      Serial.println("Driving Mode => UP");
+      startedDrivingMillis = millis();
+      digitalWrite(downOutputPin, LOW);
+      digitalWrite(upOutputPin, HIGH);
+      break;
+    case DrivingMode::DOWN:
+      Serial.println("Driving Mode => DOWN");
+      startedDrivingMillis = millis();
+      digitalWrite(upOutputPin, LOW);
+      digitalWrite(downOutputPin, HIGH);
+      break;
+  }
+}
+
 void ICACHE_RAM_ATTR hardwareButtonChangedISR() {
   if (digitalRead(upInputPin) == HIGH && digitalRead(downInputPin) == HIGH) {
-    Serial.println("Both input pins HIGH => STOP");
-    digitalWrite(upOutputPin, LOW);
-    digitalWrite(downOutputPin, LOW);
+    setDrivingMode(DrivingMode::STOP);
   } else if (digitalRead(upInputPin) == HIGH) {
-    Serial.println("Only up input pin HIGH => DRIVE UP");
-    startedDrivingMillis = millis();
-    digitalWrite(upOutputPin, HIGH);
-    digitalWrite(downOutputPin, LOW);
+    setDrivingMode(DrivingMode::UP);
   } else if (digitalRead(downInputPin) == HIGH) {
-    Serial.println("Only down input pin HIGH => DRIVE DOWN");
-    startedDrivingMillis = millis();
-    digitalWrite(upOutputPin, LOW);
-    digitalWrite(downOutputPin, HIGH);
+    setDrivingMode(DrivingMode::DOWN);
   } else {
-    Serial.println("Both input pins LOW => STOP");
-    digitalWrite(upOutputPin, LOW);
-    digitalWrite(downOutputPin, LOW);
+    setDrivingMode(DrivingMode::STOP);
   }
 }
 
 void do_stop(const JsonVariant &input) {
-  Serial.println("STOP");
-
-  digitalWrite(upOutputPin, LOW);
-  digitalWrite(downOutputPin, LOW);
-
-  digitalWrite(LED_BUILTIN, HIGH);
+  setDrivingMode(DrivingMode::STOP);
 }
 
 void do_up(const JsonVariant &input) {
-  Serial.println("UP");
-  
-  digitalWrite(upOutputPin, HIGH);
-  digitalWrite(downOutputPin, LOW);
-
-  digitalWrite(LED_BUILTIN, LOW);
+  setDrivingMode(DrivingMode::UP);
 }
 
 void do_down(const JsonVariant &input) {
-  Serial.println("DOWN");
-  
-  digitalWrite(upOutputPin, LOW);
-  digitalWrite(downOutputPin, HIGH);
-
-  digitalWrite(LED_BUILTIN, LOW);
+  setDrivingMode(DrivingMode::DOWN);
 }
 
 ThingActionObject *stop_action_generator(DynamicJsonDocument *input) {
