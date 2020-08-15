@@ -1,5 +1,5 @@
-#ifndef INCENDIO_STORAGEFS_H
-#define INCENDIO_STORAGEFS_H
+#ifndef LUMOS_STORAGEFS_H
+#define LUMOS_STORAGEFS_H
 
 #ifdef ESP32
   #include <SPIFFS.h>
@@ -10,7 +10,7 @@
   #define FILE_APPEND     "a"
 #endif
 
-namespace Incendio {
+namespace Lumos {
   class StorageFSImpl {
     public:
       bool begin(void);
@@ -39,6 +39,6 @@ namespace Incendio {
   };
 }
 
-extern Incendio::StorageFSImpl StorageFS;
+extern Lumos::StorageFSImpl StorageFS;
 
-#endif /* INCENDIO_STORAGEFS_H */
+#endif /* LUMOS_STORAGEFS_H */

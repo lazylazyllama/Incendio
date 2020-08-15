@@ -8,10 +8,6 @@ const unsigned char downInputPin = 5;
 // Init motor timer
 unsigned long startedDrivingMillis = 0;
 
-// Define I2C pins for power consumption sensor
-#define local_CLK 14
-#define local_CS 12
-
 // Define adc temperature values
 #define TO_KELVIN(x) ((x) + 273.15)
 #define TO_CELSIUS(x) ((x) - 273.15)
@@ -22,7 +18,7 @@ unsigned long startedDrivingMillis = 0;
 #define ANALOG_B     3350.0
 
 // Create power consumption sensor
-ADE7953 myADE7953(local_CLK, local_CS);
+Lumos::ADE7953 ade7953(12, 14);
 
 // Webthings device types
 const char *deviceTypesRollerShutter[] = { nullptr };
@@ -89,12 +85,14 @@ ThingActionObject *down_action_generator(DynamicJsonDocument *input) {
   return new ThingActionObject("down", input, do_down, nullptr);
 }
 
-Incendio::RollerShutter::RollerShutter(const char *title)
+Lumos::RollerShutter::RollerShutter(const char *title)
   : Device(title, deviceTypesRollerShutter),
     stopAction("stop", "Stop", "Whether the shutter stops driving", "ToggleAction", nullptr, stop_action_generator),
     upAction("up", "Up", "Whether the shutter drives up", "ToggleAction", nullptr, up_action_generator),
     downAction("down", "Down", "Whether the shutter drives down", "ToggleAction", nullptr, down_action_generator),
     powerProperty("power", "The current power consumption in watt", NUMBER, "InstantaneousPowerProperty"),
+    currentProperty("current", "The current current in ampere", NUMBER, "CurrentProperty"),
+    voltageProperty("voltage", "The current voltage in volt", NUMBER, "VoltageProperty"),
     temperatureProperty("temperature", "The current temperature of the device in °C", NUMBER, "TemperatureProperty") {
 
   // Add actions
@@ -107,6 +105,16 @@ Incendio::RollerShutter::RollerShutter(const char *title)
   ThingPropertyValue powerValue;
   powerValue.number = 0.0;
   powerProperty.setValue(powerValue);
+
+  device.addProperty(&currentProperty);
+  ThingPropertyValue currentValue;
+  currentValue.number = 0.0;
+  currentProperty.setValue(currentValue);
+
+  device.addProperty(&voltageProperty);
+  ThingPropertyValue voltageValue;
+  voltageValue.number = 0.0;
+  voltageProperty.setValue(voltageValue);
 
   device.addProperty(&temperatureProperty);
   ThingPropertyValue temperatureValue;
@@ -128,11 +136,10 @@ Incendio::RollerShutter::RollerShutter(const char *title)
   attachInterrupt(digitalPinToInterrupt(downInputPin), hardwareButtonChangedISR, CHANGE);
 
   // Init ADE7953 power sensor
-  /* delay(200);
-  myADE7953.initialize(); */
+  ade7953.init();
 };
 
-void Incendio::RollerShutter::handle(void) {
+void Lumos::RollerShutter::handle(void) {
   unsigned long currentMillis = millis();
 
   // TODO handle millis() overflow
@@ -149,20 +156,38 @@ void Incendio::RollerShutter::handle(void) {
   if ((currentMillis - last10sMillis) >= 10000) {
     last10sMillis = currentMillis;
 
-    /* // Power consumption
-    static float old_activePowerA = 0.0;
-    float activePowerA = myADE7953.getInstActivePowerA();
+    // Power consumption
+    static int old_power = 0.0;
+    float power = ade7953.getPower();
+    float current = ade7953.getCurrent();
+    int voltage = ade7953.getVoltage();
     if (true) {
-      old_activePowerA = activePowerA;
+      old_power = power;
 
       ThingPropertyValue powerValue;
-      powerValue.number = activePowerA;
+      powerValue.number = power;
       powerProperty.setValue(powerValue);
 
+      ThingPropertyValue currentValue;
+      currentValue.number = current;
+      currentProperty.setValue(currentValue);
+
+      ThingPropertyValue voltageValue;
+      voltageValue.number = voltage;
+      voltageProperty.setValue(voltageValue);
+
       Serial.print("Update power consumption: ");
-      Serial.print(activePowerA);
+      Serial.print(power);
       Serial.println("W");
-    } */
+
+      Serial.print("Update current consumption: ");
+      Serial.print(current);
+      Serial.println("I");
+
+      Serial.print("Update voltage consumption: ");
+      Serial.print(voltage);
+      Serial.println("V");
+    }
 
     // Temperature
     static int old_adc = 0;

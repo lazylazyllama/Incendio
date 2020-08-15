@@ -3,10 +3,10 @@
 #define CONFIG_FILE_NAME "/config.json"
 #define CONFIG_FILE_SIZE 512
 
-String Incendio::Config::deviceName = "Undefiniertes Gerät";
-Incendio::DeviceType Incendio::Config::deviceType = DeviceType::UNDEFINED;
+String Lumos::Config::deviceName = "Undefiniertes Gerät";
+Lumos::DeviceType Lumos::Config::deviceType = DeviceType::UNDEFINED;
 
-void Incendio::Config::load() {
+void Lumos::Config::load() {
   bool ok = StorageFS.begin();
 
   if(!ok) {
@@ -22,15 +22,15 @@ void Incendio::Config::load() {
     Serial.println(F("Failed to read file, using default state"));
   }
 
-  Incendio::Config::deviceName = doc["deviceName"] | "Incendio Device";
-  Incendio::Config::deviceType = doc["deviceType"] | Incendio::DeviceType::UNDEFINED;
+  Lumos::Config::deviceName = doc["deviceName"] | "Lumos Device";
+  Lumos::Config::deviceType = doc["deviceType"] | Lumos::DeviceType::UNDEFINED;
 
   file.close();
 
   StorageFS.end();
 }
 
-void Incendio::Config::save() {
+void Lumos::Config::save() {
   bool ok = StorageFS.begin();
 
   if(!ok) {
@@ -47,8 +47,8 @@ void Incendio::Config::save() {
 
   StaticJsonDocument<CONFIG_FILE_SIZE> doc;
 
-  doc["deviceName"] = Incendio::Config::deviceName;
-  doc["deviceType"] = Incendio::Config::deviceType;
+  doc["deviceName"] = Lumos::Config::deviceName;
+  doc["deviceType"] = Lumos::Config::deviceType;
 
   // Serialize JSON to file
   if (serializeJson(doc, file) == 0) {

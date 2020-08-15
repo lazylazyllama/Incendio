@@ -13,7 +13,7 @@
 #include "device/roller_shutter/roller_shutter.hpp"
 
 WebThingAdapter* adapter;
-Incendio::Device* device;
+Lumos::Device* device;
 
 const int port = 443;
 
@@ -23,24 +23,24 @@ void setup(void) {
     btStop();
   #endif
 
-  Incendio::Wifi::begin();
-  Incendio::OTA::begin();
-  Incendio::State::load();
-  Incendio::Config::load();
+  Lumos::Wifi::begin();
+  Lumos::OTA::begin();
+  Lumos::State::load();
+  Lumos::Config::load();
 
-  adapter = new WebThingAdapter("incendio-adapter", WiFi.localIP(), port);
-  switch (Incendio::Config::deviceType) {
-    case Incendio::DeviceType::UNDEFINED:
+  adapter = new WebThingAdapter("lumos-adapter", WiFi.localIP(), port);
+  switch (Lumos::Config::deviceType) {
+    case Lumos::DeviceType::UNDEFINED:
       // TODO Remove this code and replace it with something better
-      device = new Incendio::RollerShutter(Incendio::Config::deviceName.c_str());
+      device = new Lumos::RollerShutter(Lumos::Config::deviceName.c_str());
       break;
 
-    case Incendio::DeviceType::RGBW_LIGHTSTRIP:
-      device = new Incendio::RgbwLightstrip(Incendio::Config::deviceName.c_str());
+    case Lumos::DeviceType::RGBW_LIGHTSTRIP:
+      device = new Lumos::RgbwLightstrip(Lumos::Config::deviceName.c_str());
       break;
 
-    case Incendio::DeviceType::ROLLER_SHUTTER:
-      device = new Incendio::RollerShutter(Incendio::Config::deviceName.c_str());
+    case Lumos::DeviceType::ROLLER_SHUTTER:
+      device = new Lumos::RollerShutter(Lumos::Config::deviceName.c_str());
       break;
   }
   
@@ -58,7 +58,7 @@ void setup(void) {
 }
 
 void loop(void) {
-  Incendio::OTA::handle();
+  Lumos::OTA::handle();
 
   adapter->update();
   device->handle();

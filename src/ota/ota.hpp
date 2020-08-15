@@ -1,9 +1,9 @@
-#ifndef INCENDIO_OTA_H
-#define INCENDIO_OTA_H
+#ifndef LUMOS_OTA_H
+#define LUMOS_OTA_H
 
 #include <ArduinoOTA.h>
 
-namespace Incendio {
+namespace Lumos {
   class OTA {
     public:
       static void begin(void);
@@ -11,4 +11,4 @@ namespace Incendio {
   };
 }
 
-#endif /* INCENDIO_OTA_H */
+#endif /* LUMOS_OTA_H */

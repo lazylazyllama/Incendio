@@ -6,13 +6,13 @@ static AsyncWiFiManager wifiManager(&webServer,&dnsServer);
 
 AsyncWiFiManagerParameter customDeviceNameParameter("");
 
-void Incendio::Wifi::begin(void) {
+void Lumos::Wifi::begin(void) {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
 
-  Incendio::Config::load();
+  Lumos::Config::load();
 
-  customDeviceNameParameter = AsyncWiFiManagerParameter("device name", "Custom device name e.g. Kitchen Light", Incendio::Config::deviceName.c_str(), 40);
+  customDeviceNameParameter = AsyncWiFiManagerParameter("device name", "Custom device name e.g. Kitchen Light", Lumos::Config::deviceName.c_str(), 40);
   
   wifiManager.addParameter(&customDeviceNameParameter);
   wifiManager.setCustomHeadElement(HTTP_CUSTOM_STYLE);
@@ -22,9 +22,9 @@ void Incendio::Wifi::begin(void) {
   while (WiFi.status() != WL_CONNECTED);
   
   String hostName = "Webthings Device";
-  if (!Incendio::Config::deviceName.equals("")) {
+  if (!Lumos::Config::deviceName.equals("")) {
     hostName.concat(": ");
-    hostName.concat(Incendio::Config::deviceName);
+    hostName.concat(Lumos::Config::deviceName);
   }
   
   #ifdef ESP32
@@ -40,7 +40,7 @@ void Incendio::Wifi::begin(void) {
   digitalWrite(LED_BUILTIN, LOW);
 }
 
-void Incendio::Wifi::saveCustomParameters(void) {
-  Incendio::Config::deviceName = customDeviceNameParameter.getValue();
-  Incendio::Config::save();
+void Lumos::Wifi::saveCustomParameters(void) {
+  Lumos::Config::deviceName = customDeviceNameParameter.getValue();
+  Lumos::Config::save();
 }

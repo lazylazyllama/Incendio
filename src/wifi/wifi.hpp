@@ -1,5 +1,5 @@
-#ifndef INCENDIO_WIFI_H
-#define INCENDIO_WIFI_H
+#ifndef LUMOS_WIFI_H
+#define LUMOS_WIFI_H
 
 #include <Arduino.h>
 #ifdef ESP32
@@ -12,7 +12,7 @@
 
 #include "config/config.hpp"
 
-namespace Incendio {
+namespace Lumos {
   class Wifi {
     public:
       static void begin(void);
@@ -116,4 +116,4 @@ namespace Incendio {
   )rawliteral";
 }
 
-#endif /* INCENDIO_WIFI_H */
+#endif /* LUMOS_WIFI_H */

@@ -1,10 +1,10 @@
-#ifndef INCENDIO_STATE_H
-#define INCENDIO_STATE_H
+#ifndef LUMOS_STATE_H
+#define LUMOS_STATE_H
 
 #include <ArduinoJson.h>
 #include "../storageFS/storageFS.hpp"
 
-namespace Incendio {
+namespace Lumos {
   class State {
     public:
       static bool on;
@@ -19,4 +19,4 @@ namespace Incendio {
   };
 }
 
-#endif /* INCENDIO_STATE_H */
+#endif /* LUMOS_STATE_H */

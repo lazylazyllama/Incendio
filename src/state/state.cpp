@@ -3,13 +3,13 @@
 #define STATE_FILE_NAME "/state.json"
 #define STATE_FILE_SIZE 512
 
-bool Incendio::State::on = false;
-float Incendio::State::brightness = 100.0f;
-String Incendio::State::color = "#ffffff";
-String Incendio::State::colorMode = "temperature";
-int Incendio::State::colorTemperature = 2700;
+bool Lumos::State::on = false;
+float Lumos::State::brightness = 100.0f;
+String Lumos::State::color = "#ffffff";
+String Lumos::State::colorMode = "temperature";
+int Lumos::State::colorTemperature = 2700;
 
-void Incendio::State::load() {
+void Lumos::State::load() {
   bool ok = StorageFS.begin();
 
   if(!ok) {
@@ -25,18 +25,18 @@ void Incendio::State::load() {
     Serial.println(F("Failed to read file, using default state"));
   }
 
-  Incendio::State::on = doc["on"] | false;
-  Incendio::State::brightness = doc["brightness"] | 100.0f;
-  Incendio::State::color = doc["color"] | "#ffffff";
-  Incendio::State::colorMode = doc["colorMode"] | "temperature";
-  Incendio::State::colorTemperature = doc["colorTemperature"] | 2700;
+  Lumos::State::on = doc["on"] | false;
+  Lumos::State::brightness = doc["brightness"] | 100.0f;
+  Lumos::State::color = doc["color"] | "#ffffff";
+  Lumos::State::colorMode = doc["colorMode"] | "temperature";
+  Lumos::State::colorTemperature = doc["colorTemperature"] | 2700;
 
   file.close();
 
   StorageFS.end();
 }
 
-void Incendio::State::save() {
+void Lumos::State::save() {
   bool ok = StorageFS.begin();
 
   if(!ok) {
@@ -53,11 +53,11 @@ void Incendio::State::save() {
 
   StaticJsonDocument<STATE_FILE_SIZE> doc;
 
-  doc["lastOn"] = Incendio::State::on;
-  doc["lastBrightness"] = Incendio::State::brightness;
-  doc["lastColor"] = Incendio::State::color;
-  doc["lastColorMode"] = Incendio::State::colorMode;
-  doc["lastColorTemperature"] = Incendio::State::colorTemperature;
+  doc["lastOn"] = Lumos::State::on;
+  doc["lastBrightness"] = Lumos::State::brightness;
+  doc["lastColor"] = Lumos::State::color;
+  doc["lastColorMode"] = Lumos::State::colorMode;
+  doc["lastColorTemperature"] = Lumos::State::colorTemperature;
 
   // Serialize JSON to file
   if (serializeJson(doc, file) == 0) {

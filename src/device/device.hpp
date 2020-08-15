@@ -1,5 +1,5 @@
-#ifndef INCENDIO_DEVICE_H
-#define INCENDIO_DEVICE_H
+#ifndef LUMOS_DEVICE_H
+#define LUMOS_DEVICE_H
 
 #define ARDUINOJSON_USE_LONG_LONG 1
 #include <Thing.h>
@@ -10,7 +10,7 @@
 
 #include "../state/state.hpp"
 
-namespace Incendio {
+namespace Lumos {
   enum DeviceType {
     UNDEFINED, RGBW_LIGHTSTRIP, ROLLER_SHUTTER
   };
@@ -20,9 +20,9 @@ namespace Incendio {
       ThingDevice device;
 
     public:
-      Device(const char *title, const char **deviceTypes) : device("incendio-device", title, deviceTypes) {};
+      Device(const char *title, const char **deviceTypes) : device("lumos-device", title, deviceTypes) {};
       virtual void handle(void) = 0;
   };
 }
 
-#endif /* INCENDIO_DEVICE_H */
+#endif /* LUMOS_DEVICE_H */

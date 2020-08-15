@@ -1,5 +1,5 @@
-#ifndef INCENDIO_DEVICE_RGBW_LIGHTSTRIP_H
-#define INCENDIO_DEVICE_RGBW_LIGHTSTRIP_H
+#ifndef LUMOS_DEVICE_RGBW_LIGHTSTRIP_H
+#define LUMOS_DEVICE_RGBW_LIGHTSTRIP_H
 
 #define ARDUINOJSON_USE_LONG_LONG 1
 #include <Thing.h>
@@ -7,8 +7,8 @@
 
 #include "../device.hpp"
 
-namespace Incendio {
-  class RgbwLightstrip : public Incendio::Device {
+namespace Lumos {
+  class RgbwLightstrip : public Lumos::Device {
     private:
       ThingProperty onProperty;
       ThingProperty brightnessProperty;
@@ -26,4 +26,4 @@ namespace Incendio {
   };
 }
 
-#endif /* INCENDIO_DEVICE_RGBW_LIGHTSTRIP_H */
+#endif /* LUMOS_DEVICE_RGBW_LIGHTSTRIP_H */

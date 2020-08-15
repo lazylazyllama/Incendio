@@ -11,7 +11,7 @@ const unsigned char whitePin = 15;
 
 const char *deviceTypesRgbwLightstrip[] = { "OnOffSwitch", "Light", "ColorControl", nullptr };
 
-Incendio::RgbwLightstrip::RgbwLightstrip(const char *title)
+Lumos::RgbwLightstrip::RgbwLightstrip(const char *title)
   : Device(title, deviceTypesRgbwLightstrip),
     onProperty("on", "Whether the led is turned on", BOOLEAN, "OnOffProperty"),
     brightnessProperty("brithgness", "The brithgness of light from 0-100", NUMBER, "BrightnessProperty"),
@@ -57,7 +57,7 @@ Incendio::RgbwLightstrip::RgbwLightstrip(const char *title)
   digitalWrite(whitePin, HIGH);
 };
 
-void Incendio::RgbwLightstrip::handle(void) {
+void Lumos::RgbwLightstrip::handle(void) {
   bool on = onProperty.getValue().boolean;
   float brightness = brightnessProperty.getValue().number;
   int colorTemperature = colorTemperatureProperty.getValue().integer;
@@ -123,7 +123,7 @@ void Incendio::RgbwLightstrip::handle(void) {
   }
 }
 
-void Incendio::RgbwLightstrip::updateColor(String *color, float const brightness) {
+void Lumos::RgbwLightstrip::updateColor(String *color, float const brightness) {
   if (!color) {
     return;
   }
@@ -148,7 +148,7 @@ void Incendio::RgbwLightstrip::updateColor(String *color, float const brightness
   #endif
 }
 
-void Incendio::RgbwLightstrip::updateWhite(float const brightness) {
+void Lumos::RgbwLightstrip::updateWhite(float const brightness) {
   int dim = map(brightness, 0, 100, 255, 0);
   #ifdef ESP32
     analogWrite(redPin, 0, 255U);

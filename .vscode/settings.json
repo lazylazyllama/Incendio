@@ -11,6 +11,8 @@
         "regex": "cpp",
         "list": "cpp",
         "*.tcc": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "random": "cpp",
+        "limits": "cpp"
     }
 }
