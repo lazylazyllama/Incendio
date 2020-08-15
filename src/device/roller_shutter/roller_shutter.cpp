@@ -23,6 +23,7 @@ void setDrivingMode(DrivingMode mode) {
   switch (mode) {
     case DrivingMode::STOP:
       Serial.println("Driving Mode => STOP");
+      startedDrivingMillis = 0;
       digitalWrite(upOutputPin, LOW);
       digitalWrite(downOutputPin, LOW);
       break;
@@ -124,8 +125,8 @@ void Lumos::RollerShutter::handle(void) {
 
   // TODO handle millis() overflow
   // Stop motor after 1 minute
-  if ((currentMillis - startedDrivingMillis) >= 60000 && startedDrivingMillis != 0) {
-    Serial.println("Driving for 1 minute already => STOP");
+  if ((currentMillis - startedDrivingMillis) >= (120000) && startedDrivingMillis != 0) {
+    Serial.println("Driving for 2 minutes already => STOP");
     startedDrivingMillis = 0;
     digitalWrite(upOutputPin, LOW);
     digitalWrite(downOutputPin, LOW);
@@ -134,12 +135,14 @@ void Lumos::RollerShutter::handle(void) {
   // Only update sensors all 10 seconds
   static unsigned long last10sMillis = millis();
   if ((currentMillis - last10sMillis) >= 10000) {
+    
+  Serial.println(currentMillis - startedDrivingMillis);
     last10sMillis = currentMillis;
 
     // Power consumption
     static float old_power = 0.0;
     float power = ade7953Sensor.getPower();
-    if (true) {
+    if (abs(power - old_power) >= 2) {
       old_power = power;
 
       ThingPropertyValue powerValue;
@@ -154,7 +157,7 @@ void Lumos::RollerShutter::handle(void) {
     // Temperature
     static double old_temperature = 0.0;
     float temperature = ntcSensor.getTemperature();
-    if ((temperature - old_temperature) >= 20 || (temperature - old_temperature) <= 20) {
+    if (abs(temperature - old_temperature) >= 20) {
       old_temperature = temperature;
 
       ThingPropertyValue temperatureValue;
