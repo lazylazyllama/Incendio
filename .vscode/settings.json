@@ -13,6 +13,7 @@
         "*.tcc": "cpp",
         "fstream": "cpp",
         "random": "cpp",
-        "limits": "cpp"
+        "limits": "cpp",
+        "cmath": "cpp"
     }
 }

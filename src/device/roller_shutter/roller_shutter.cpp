@@ -8,17 +8,9 @@ const unsigned char downInputPin = 5;
 // Init motor timer
 unsigned long startedDrivingMillis = 0;
 
-// Define adc temperature values
-#define TO_KELVIN(x) ((x) + 273.15)
-#define TO_CELSIUS(x) ((x) - 273.15)
-#define ANALOG_V33   3.3
-#define ANALOG_R21   32000.0
-#define ANALOG_R0    10000.0
-#define ANALOG_T0    TO_KELVIN(25.0)
-#define ANALOG_B     3350.0
-
 // Create power consumption sensor
-Lumos::ADE7953 ade7953(12, 14);
+Lumos::ADE7953Sensor ade7953Sensor(12, 14);
+Lumos::NtcSensor ntcSensor(3350, 32000, 8000, (273.15 + 25.0));
 
 // Webthings device types
 const char *deviceTypesRollerShutter[] = { nullptr };
@@ -91,8 +83,6 @@ Lumos::RollerShutter::RollerShutter(const char *title)
     upAction("up", "Up", "Whether the shutter drives up", "ToggleAction", nullptr, up_action_generator),
     downAction("down", "Down", "Whether the shutter drives down", "ToggleAction", nullptr, down_action_generator),
     powerProperty("power", "The current power consumption in watt", NUMBER, "InstantaneousPowerProperty"),
-    currentProperty("current", "The current current in ampere", NUMBER, "CurrentProperty"),
-    voltageProperty("voltage", "The current voltage in volt", NUMBER, "VoltageProperty"),
     temperatureProperty("temperature", "The current temperature of the device in °C", NUMBER, "TemperatureProperty") {
 
   // Add actions
@@ -105,16 +95,6 @@ Lumos::RollerShutter::RollerShutter(const char *title)
   ThingPropertyValue powerValue;
   powerValue.number = 0.0;
   powerProperty.setValue(powerValue);
-
-  device.addProperty(&currentProperty);
-  ThingPropertyValue currentValue;
-  currentValue.number = 0.0;
-  currentProperty.setValue(currentValue);
-
-  device.addProperty(&voltageProperty);
-  ThingPropertyValue voltageValue;
-  voltageValue.number = 0.0;
-  voltageProperty.setValue(voltageValue);
 
   device.addProperty(&temperatureProperty);
   ThingPropertyValue temperatureValue;
@@ -136,7 +116,7 @@ Lumos::RollerShutter::RollerShutter(const char *title)
   attachInterrupt(digitalPinToInterrupt(downInputPin), hardwareButtonChangedISR, CHANGE);
 
   // Init ADE7953 power sensor
-  ade7953.init();
+  ade7953Sensor.init();
 };
 
 void Lumos::RollerShutter::handle(void) {
@@ -157,10 +137,8 @@ void Lumos::RollerShutter::handle(void) {
     last10sMillis = currentMillis;
 
     // Power consumption
-    static int old_power = 0.0;
-    float power = ade7953.getPower();
-    float current = ade7953.getCurrent();
-    int voltage = ade7953.getVoltage();
+    static float old_power = 0.0;
+    float power = ade7953Sensor.getPower();
     if (true) {
       old_power = power;
 
@@ -168,42 +146,23 @@ void Lumos::RollerShutter::handle(void) {
       powerValue.number = power;
       powerProperty.setValue(powerValue);
 
-      ThingPropertyValue currentValue;
-      currentValue.number = current;
-      currentProperty.setValue(currentValue);
-
-      ThingPropertyValue voltageValue;
-      voltageValue.number = voltage;
-      voltageProperty.setValue(voltageValue);
-
       Serial.print("Update power consumption: ");
       Serial.print(power);
       Serial.println("W");
-
-      Serial.print("Update current consumption: ");
-      Serial.print(current);
-      Serial.println("I");
-
-      Serial.print("Update voltage consumption: ");
-      Serial.print(voltage);
-      Serial.println("V");
     }
 
     // Temperature
-    static int old_adc = 0;
-    int adc = analogRead(A0);
-    if ((adc - old_adc) >= 20 || (adc - old_adc) <= 20) {
-      old_adc = adc;
-      double Rt = (adc * ANALOG_R21) / (1024.0 * ANALOG_V33 - (double)adc);
-      double T = ANALOG_B / (ANALOG_B/ANALOG_T0 + log(Rt/ANALOG_R0));
-      double temp = TO_CELSIUS(T);
+    static double old_temperature = 0.0;
+    float temperature = ntcSensor.getTemperature();
+    if ((temperature - old_temperature) >= 20 || (temperature - old_temperature) <= 20) {
+      old_temperature = temperature;
 
       ThingPropertyValue temperatureValue;
-      temperatureValue.number = temp;
+      temperatureValue.number = temperature;
       temperatureProperty.setValue(temperatureValue);
 
       Serial.print("Update temperature: ");
-      Serial.print(temp);
+      Serial.print(temperature);
       Serial.println("°C");
     }
   }

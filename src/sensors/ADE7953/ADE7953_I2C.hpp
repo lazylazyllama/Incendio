@@ -6,14 +6,14 @@
 #include <math.h>
 
 namespace Lumos {
-  class ADE7953 {
+  class ADE7953Sensor {
     private:
       const uint8_t address = 0x38;
       const int sda;
       const int scl;
 
     public:
-      ADE7953(int sda, int scl) : sda(sda), scl(scl) {}
+      ADE7953Sensor(int sda, int scl) : sda(sda), scl(scl) {}
       
     public:
       void init();

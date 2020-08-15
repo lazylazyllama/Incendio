@@ -6,6 +6,7 @@
 #include <WebThingAdapter.h>
 
 #include "../../sensors/ADE7953/ADE7953_I2C.hpp"
+#include "../../sensors/ntc/ntc.hpp"
 #include "../device.hpp"
 
 namespace Lumos {
@@ -16,8 +17,6 @@ namespace Lumos {
       ThingAction downAction;
 
       ThingProperty powerProperty;
-      ThingProperty currentProperty;
-      ThingProperty voltageProperty;
       ThingProperty temperatureProperty;
 
     public:

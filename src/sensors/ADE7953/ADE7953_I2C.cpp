@@ -4,25 +4,25 @@
 #define ADE7953_UREF            26000
 #define ADE7953_IREF            10000.0
 
-void Lumos::ADE7953::init() {
+void Lumos::ADE7953Sensor::init() {
   delay(100);
 
   Wire.begin(sda, scl);
 }
 
-float Lumos::ADE7953::getPower() {
+float Lumos::ADE7953Sensor::getPower() {
   return getCurrent() * getVoltage();
 }
 
-float Lumos::ADE7953::getCurrent() {
+float Lumos::ADE7953Sensor::getCurrent() {
   return max(read(address, 0x31A), read(address, 0x31B)) / (ADE7953_IREF * 10);
 }
 
-int Lumos::ADE7953::getVoltage() {
+int Lumos::ADE7953Sensor::getVoltage() {
   return read(address, 0x31C) / ADE7953_UREF;
 }
 
-uint32_t Lumos::ADE7953::read(int address, uint16_t reg) {
+uint32_t Lumos::ADE7953Sensor::read(int address, uint16_t reg) {
   uint32_t response = 0;
   const int size = regSize(reg);
   if (size) {
@@ -40,7 +40,7 @@ uint32_t Lumos::ADE7953::read(int address, uint16_t reg) {
   return response;
 }
 
-int Lumos::ADE7953::regSize(const uint16_t reg) {
+int Lumos::ADE7953Sensor::regSize(const uint16_t reg) {
   const uint8_t mask = ((reg >> 8) & 0b1111);
   if (!mask || (mask & 0b1100)) {
     return 1;
