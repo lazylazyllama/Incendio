@@ -43,7 +43,6 @@ void setup(void) {
       device = new Lumos::RollerShutter(Lumos::Config::deviceName.c_str());
       break;
   }
-  
 
   adapter->addDevice(&device->device);
 
