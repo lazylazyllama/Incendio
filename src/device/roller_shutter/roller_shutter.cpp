@@ -127,16 +127,12 @@ void Lumos::RollerShutter::handle(void) {
   // Stop motor after 1 minute
   if ((currentMillis - startedDrivingMillis) >= (120000) && startedDrivingMillis != 0) {
     Serial.println("Driving for 2 minutes already => STOP");
-    startedDrivingMillis = 0;
-    digitalWrite(upOutputPin, LOW);
-    digitalWrite(downOutputPin, LOW);
+    setDrivingMode(DrivingMode::STOP);
   }
 
   // Only update sensors all 10 seconds
   static unsigned long last10sMillis = millis();
   if ((currentMillis - last10sMillis) >= 10000) {
-    
-  Serial.println(currentMillis - startedDrivingMillis);
     last10sMillis = currentMillis;
 
     // Power consumption
@@ -152,6 +148,11 @@ void Lumos::RollerShutter::handle(void) {
       Serial.print("Update power consumption: ");
       Serial.print(power);
       Serial.println("W");
+    }
+
+    // Auto relay stop by power consumption
+    if (power < 10) {
+      setDrivingMode(DrivingMode::STOP);
     }
 
     // Temperature
