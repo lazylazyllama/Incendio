@@ -8,7 +8,7 @@
 #include <ArduinoJson.h>
 
 #include "../storageFS/storageFS.hpp"
-#include "../device/device.hpp"
+#include "../devices/device.hpp"
 
 namespace Lumos {
   class Config {

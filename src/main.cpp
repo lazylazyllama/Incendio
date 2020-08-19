@@ -9,9 +9,9 @@
 #include "ota/ota.hpp"
 #include "wifi/wifi.hpp"
 #include "state/state.hpp"
-#include "device/device.hpp"
-#include "device/rgbw_lightstrip/rgbw_lightstrip.hpp"
-#include "device/roller_shutter/roller_shutter.hpp"
+#include "devices/device.hpp"
+#include "devices/rgbw_lightstrip/rgbw_lightstrip.hpp"
+#include "devices/roller_shutter/roller_shutter.hpp"
 
 WebThingAdapter* adapter;
 Lumos::Device* device;
