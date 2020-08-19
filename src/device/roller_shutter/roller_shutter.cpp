@@ -65,8 +65,8 @@ Lumos::RollerShutter::RollerShutter(const char *title)
   pinMode(downOutputPin, OUTPUT);
   digitalWrite(downOutputPin, LOW);
 
-  pinMode(upInputPin, INPUT_PULLUP);
-  pinMode(downInputPin, INPUT_PULLUP);
+  pinMode(upInputPin, INPUT);
+  pinMode(downInputPin, INPUT);
 
   // Init ADE7953 power sensor
   ade7953Sensor.init();
@@ -84,10 +84,14 @@ void Lumos::RollerShutter::handle(void) {
     int downButton = digitalRead(downInputPin);
     if (upButton == HIGH && downButton == HIGH) {
       drivingMode = DrivingMode::STOP;
-    } else {
-      if (upButton == HIGH && drivingMode == DrivingMode::STOP) {
+    } else if (upButton == HIGH) {
+      if (drivingMode == DrivingMode::STOP) {
         drivingMode = DrivingMode::UP;
-      } else if (downButton == HIGH && drivingMode == DrivingMode::STOP) {
+      } else {
+        drivingMode = DrivingMode::STOP;
+      }
+    } else if (downButton == HIGH) {
+      if (drivingMode == DrivingMode::STOP) {
         drivingMode = DrivingMode::DOWN;
       } else {
         drivingMode = DrivingMode::STOP;
@@ -96,18 +100,21 @@ void Lumos::RollerShutter::handle(void) {
 
     switch (drivingMode) {
       case STOP:
+        Serial.println("STOP");
         digitalWrite(upOutputPin, LOW);
         digitalWrite(downOutputPin, LOW);
         startedDrivingMillis = 0;
         break;
 
       case UP:
+        Serial.println("UP");
         digitalWrite(downOutputPin, LOW);
         digitalWrite(upOutputPin, HIGH);
         startedDrivingMillis = currentMillis;
         break;
 
       case DOWN:
+        Serial.println("DOWN");
         digitalWrite(upOutputPin, LOW);
         digitalWrite(downOutputPin, HIGH);
         startedDrivingMillis = currentMillis;
