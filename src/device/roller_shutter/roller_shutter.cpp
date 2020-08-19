@@ -80,23 +80,27 @@ void Lumos::RollerShutter::handle(void) {
   if ((currentMillis - last500ms) >= 500 || (currentMillis - last500ms) < 0) {
     last500ms = currentMillis;
 
+    static int lastUpButton = 0;
+    static int lastDownButton = 0;
     int upButton = digitalRead(upInputPin);
     int downButton = digitalRead(downInputPin);
     if (upButton == HIGH && downButton == HIGH) {
       drivingMode = DrivingMode::STOP;
     } else if (upButton == HIGH) {
-      if (drivingMode == DrivingMode::STOP) {
+      if ((drivingMode == DrivingMode::STOP && lastUpButton == LOW) || (drivingMode == DrivingMode::UP && lastUpButton == HIGH)) {
         drivingMode = DrivingMode::UP;
       } else {
         drivingMode = DrivingMode::STOP;
       }
     } else if (downButton == HIGH) {
-      if (drivingMode == DrivingMode::STOP) {
+      if ((drivingMode == DrivingMode::STOP && lastDownButton == LOW) || (drivingMode == DrivingMode::DOWN && lastDownButton == HIGH)) {
         drivingMode = DrivingMode::DOWN;
       } else {
         drivingMode = DrivingMode::STOP;
       }
     }
+    lastUpButton = upButton;
+    lastDownButton = downButton;
 
     switch (drivingMode) {
       case STOP:
