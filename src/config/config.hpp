@@ -2,6 +2,8 @@
 #define LUMOS_CONFIG_H
 
 #define ARDUINOJSON_USE_LONG_LONG 1
+#define ARDUINOJSON_DECODE_UNICODE 1
+
 #include <Arduino.h>
 #include <ArduinoJson.h>
 

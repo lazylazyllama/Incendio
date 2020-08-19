@@ -14,6 +14,7 @@
         "fstream": "cpp",
         "random": "cpp",
         "limits": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "new": "cpp"
     }
 }

@@ -1,10 +1,6 @@
 #ifndef LUMOS_DEVICE_RGBW_LIGHTSTRIP_H
 #define LUMOS_DEVICE_RGBW_LIGHTSTRIP_H
 
-#define ARDUINOJSON_USE_LONG_LONG 1
-#include <Thing.h>
-#include <WebThingAdapter.h>
-
 #include "../device.hpp"
 
 namespace Lumos {

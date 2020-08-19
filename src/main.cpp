@@ -1,5 +1,6 @@
 #define LARGE_JSON_BUFFERS 1
 #define ARDUINOJSON_USE_LONG_LONG 1
+#define ARDUINOJSON_DECODE_UNICODE 1
 
 #include <Arduino.h>
 #include <Thing.h>

@@ -17,72 +17,28 @@ const char *deviceTypesRollerShutter[] = { nullptr };
 
 enum DrivingMode {
   STOP, UP, DOWN
-};
+} drivingMode;
 
-void setDrivingMode(DrivingMode mode) {
-  switch (mode) {
-    case DrivingMode::STOP:
-      Serial.println("Driving Mode => STOP");
-      startedDrivingMillis = 0;
-      digitalWrite(upOutputPin, LOW);
-      digitalWrite(downOutputPin, LOW);
-      break;
-    case DrivingMode::UP:
-      Serial.println("Driving Mode => UP");
-      startedDrivingMillis = millis();
-      digitalWrite(downOutputPin, LOW);
-      digitalWrite(upOutputPin, HIGH);
-      break;
-    case DrivingMode::DOWN:
-      Serial.println("Driving Mode => DOWN");
-      startedDrivingMillis = millis();
-      digitalWrite(upOutputPin, LOW);
-      digitalWrite(downOutputPin, HIGH);
-      break;
-  }
+ThingActionObject* stop_action(DynamicJsonDocument *input) {
+  drivingMode = DrivingMode::STOP;
+  return nullptr;
 }
 
-void ICACHE_RAM_ATTR hardwareButtonChangedISR() {
-  if (digitalRead(upInputPin) == HIGH && digitalRead(downInputPin) == HIGH) {
-    setDrivingMode(DrivingMode::STOP);
-  } else if (digitalRead(upInputPin) == HIGH) {
-    setDrivingMode(DrivingMode::UP);
-  } else if (digitalRead(downInputPin) == HIGH) {
-    setDrivingMode(DrivingMode::DOWN);
-  } else {
-    setDrivingMode(DrivingMode::STOP);
-  }
+ThingActionObject* up_action(DynamicJsonDocument *input) {
+  drivingMode = DrivingMode::UP;
+  return nullptr;
 }
 
-void do_stop(const JsonVariant &input) {
-  setDrivingMode(DrivingMode::STOP);
-}
-
-void do_up(const JsonVariant &input) {
-  setDrivingMode(DrivingMode::UP);
-}
-
-void do_down(const JsonVariant &input) {
-  setDrivingMode(DrivingMode::DOWN);
-}
-
-ThingActionObject *stop_action_generator(DynamicJsonDocument *input) {
-  return new ThingActionObject("stop", input, do_stop, nullptr);
-}
-
-ThingActionObject *up_action_generator(DynamicJsonDocument *input) {
-  return new ThingActionObject("up", input, do_up, nullptr);
-}
-
-ThingActionObject *down_action_generator(DynamicJsonDocument *input) {
-  return new ThingActionObject("down", input, do_down, nullptr);
+ThingActionObject* down_action(DynamicJsonDocument *input) {
+  drivingMode = DrivingMode::DOWN;
+  return nullptr;
 }
 
 Lumos::RollerShutter::RollerShutter(const char *title)
   : Device(title, deviceTypesRollerShutter),
-    stopAction("stop", "Stop", "Whether the shutter stops driving", "ToggleAction", nullptr, stop_action_generator),
-    upAction("up", "Up", "Whether the shutter drives up", "ToggleAction", nullptr, up_action_generator),
-    downAction("down", "Down", "Whether the shutter drives down", "ToggleAction", nullptr, down_action_generator),
+    stopAction("stop", "Stop", "Whether the shutter stops driving", "ToggleAction", nullptr, stop_action),
+    upAction("up", "Up", "Whether the shutter drives up", "ToggleAction", nullptr, up_action),
+    downAction("down", "Down", "Whether the shutter drives down", "ToggleAction", nullptr, down_action),
     powerProperty("power", "The current power consumption in watt", NUMBER, "InstantaneousPowerProperty"),
     temperatureProperty("temperature", "The current temperature of the device in °C", NUMBER, "TemperatureProperty") {
 
@@ -109,12 +65,8 @@ Lumos::RollerShutter::RollerShutter(const char *title)
   pinMode(downOutputPin, OUTPUT);
   digitalWrite(downOutputPin, LOW);
 
-  pinMode(upInputPin, INPUT);
-  pinMode(downInputPin, INPUT);
-
-  // Init interrupts
-  attachInterrupt(digitalPinToInterrupt(upInputPin), hardwareButtonChangedISR, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(downInputPin), hardwareButtonChangedISR, CHANGE);
+  pinMode(upInputPin, INPUT_PULLUP);
+  pinMode(downInputPin, INPUT_PULLUP);
 
   // Init ADE7953 power sensor
   ade7953Sensor.init();
@@ -123,17 +75,56 @@ Lumos::RollerShutter::RollerShutter(const char *title)
 void Lumos::RollerShutter::handle(void) {
   unsigned long currentMillis = millis();
 
-  // TODO handle millis() overflow
-  // Stop motor after 1 minute
-  if ((currentMillis - startedDrivingMillis) >= (120000) && startedDrivingMillis != 0) {
-    Serial.println("Driving for 2 minutes already => STOP");
-    setDrivingMode(DrivingMode::STOP);
+  // Check for < 0 because of the overflow
+  static unsigned long last500ms = 0;
+  if ((currentMillis - last500ms) >= 500 || (currentMillis - last500ms) < 0) {
+    last500ms = currentMillis;
+
+    int upButton = digitalRead(upInputPin);
+    int downButton = digitalRead(downInputPin);
+    if (upButton == HIGH && downButton == HIGH) {
+      drivingMode = DrivingMode::STOP;
+    } else {
+      if (upButton == HIGH && drivingMode == DrivingMode::STOP) {
+        drivingMode = DrivingMode::UP;
+      } else if (downButton == HIGH && drivingMode == DrivingMode::STOP) {
+        drivingMode = DrivingMode::DOWN;
+      } else {
+        drivingMode = DrivingMode::STOP;
+      }
+    }
+
+    switch (drivingMode) {
+      case STOP:
+        digitalWrite(upOutputPin, LOW);
+        digitalWrite(downOutputPin, LOW);
+        startedDrivingMillis = 0;
+        break;
+
+      case UP:
+        digitalWrite(downOutputPin, LOW);
+        digitalWrite(upOutputPin, HIGH);
+        startedDrivingMillis = currentMillis;
+        break;
+
+      case DOWN:
+        digitalWrite(upOutputPin, LOW);
+        digitalWrite(downOutputPin, HIGH);
+        startedDrivingMillis = currentMillis;
+        break;
+    }
   }
 
-  // Only update sensors all 10 seconds
-  static unsigned long last10sMillis = millis();
-  if ((currentMillis - last10sMillis) >= 10000) {
-    last10sMillis = currentMillis;
+  // Stop motor after 2 minutes
+  if ((currentMillis - startedDrivingMillis) >= 120000 && startedDrivingMillis != 0) {
+    Serial.println("Driving for 2 minutes already => STOP");
+    drivingMode = DrivingMode::STOP;
+  }
+
+  // Only update sensors all 2 seconds
+  static unsigned long last1sMillis = millis();
+  if ((currentMillis - last1sMillis) >= 2000 || (currentMillis - last1sMillis) < 0) {
+    last1sMillis = currentMillis;
 
     // Power consumption
     static float old_power = 0.0;
@@ -153,7 +144,7 @@ void Lumos::RollerShutter::handle(void) {
     // Auto relay stop by power consumption
     if (power < 10 && startedDrivingMillis != 0) {
       Serial.println("Reached top or bottom => STOP");
-      setDrivingMode(DrivingMode::STOP);
+      drivingMode = DrivingMode::STOP;
     }
 
     // Temperature
