@@ -15,7 +15,7 @@ Lumos::NtcSensor ntcSensor(3350, 32000, 8000, (273.15 + 25.0));
 // Webthings device types
 const char *deviceTypesRollerShutter[] = { nullptr };
 
-enum DrivingMode {
+enum class DrivingMode {
   STOP, UP, DOWN
 } drivingMode;
 
@@ -103,21 +103,21 @@ void Lumos::RollerShutter::handle(void) {
     lastDownButton = downButton;
 
     switch (drivingMode) {
-      case STOP:
+      case DrivingMode::STOP:
         Serial.println("STOP");
         digitalWrite(upOutputPin, LOW);
         digitalWrite(downOutputPin, LOW);
         startedDrivingMillis = 0;
         break;
 
-      case UP:
+      case DrivingMode::UP:
         Serial.println("UP");
         digitalWrite(downOutputPin, LOW);
         digitalWrite(upOutputPin, HIGH);
         startedDrivingMillis = currentMillis;
         break;
 
-      case DOWN:
+      case DrivingMode::DOWN:
         Serial.println("DOWN");
         digitalWrite(upOutputPin, LOW);
         digitalWrite(downOutputPin, HIGH);
