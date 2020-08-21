@@ -73,11 +73,10 @@ Lumos::RollerShutter::RollerShutter(const char *title)
 };
 
 void Lumos::RollerShutter::handle(void) {
-  static unsigned long lastMillis = millis();
+  static unsigned long lastMillis = 0;
   unsigned long currentMillis = millis();
 
   // Check for < 0 because of the overflow
-  static unsigned long lastMillis = 0;
   if ((currentMillis - lastMillis) >= 500 || (currentMillis - lastMillis) < 0) {
     lastMillis = currentMillis;
 
@@ -108,21 +107,23 @@ void Lumos::RollerShutter::handle(void) {
       if (drivingMode == DrivingMode::STOP || ((drivingMode == DrivingMode::UP || drivingMode == DrivingMode::DOWN) && lastDrivingMode != DrivingMode::STOP)) {
         Serial.println("STOP");
         startedDrivingMillis = 0;
+        lastDrivingMode = DrivingMode::STOP;
         digitalWrite(upOutputPin, LOW);
         digitalWrite(downOutputPin, LOW);
       } else if (drivingMode == DrivingMode::UP) {
         Serial.println("UP");
         startedDrivingMillis = currentMillis;
+        lastDrivingMode = DrivingMode::UP;
         digitalWrite(downOutputPin, LOW);
         digitalWrite(upOutputPin, HIGH);
       } else if (drivingMode == DrivingMode::DOWN) {
         Serial.println("DOWN");
         startedDrivingMillis = currentMillis;
+        lastDrivingMode = DrivingMode::DOWN;
         digitalWrite(upOutputPin, LOW);
         digitalWrite(downOutputPin, HIGH);
       }
     }
-
 
     // Power consumption
     static float old_power = 0.0;
@@ -134,38 +135,32 @@ void Lumos::RollerShutter::handle(void) {
       powerValue.number = power;
       powerProperty.setValue(powerValue);
 
-      Serial.print("Update power consumption: ");
-      Serial.print(power);
-      Serial.println("W");
+      Serial.printf("Update power consumption: %f\n", power);
     }
 
     // Auto relay stop by power consumption
-    if (power < 10 && startedDrivingMillis != 0) {
+    /* if (power < 10 && startedDrivingMillis != 0) {
       Serial.println("Reached top or bottom => STOP");
       drivingMode = DrivingMode::STOP;
-    }
-
+    } */
 
     // Temperature
     static double old_temperature = 0.0;
     float temperature = ntcSensor.getTemperature();
-    if (abs(temperature - old_temperature) >= 20) {
+    if (abs(temperature - old_temperature) >= 1) {
       old_temperature = temperature;
 
       ThingPropertyValue temperatureValue;
       temperatureValue.number = temperature;
       temperatureProperty.setValue(temperatureValue);
 
-      Serial.print("Update temperature: ");
-      Serial.print(temperature);
-      Serial.println("°C");
+      Serial.printf("Update temperature: %f°C\n", temperature);
     }
   }
-  
 
   // Stop motor after 2 minutes
-  if ((currentMillis - startedDrivingMillis) >= 120000 && startedDrivingMillis != 0) {
+  /* if ((currentMillis - startedDrivingMillis) >= 120000 && startedDrivingMillis != 0) {
     Serial.println("Driving for 2 minutes already => STOP");
     drivingMode = DrivingMode::STOP;
-  }
+  } */
 }
