@@ -13,7 +13,7 @@
 #include "../state/state.hpp"
 
 namespace Lumos {
-  enum class DeviceType {
+  enum DeviceType {
     UNDEFINED, RGBW_LIGHTSTRIP, ROLLER_SHUTTER
   };
   

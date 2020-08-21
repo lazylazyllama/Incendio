@@ -73,12 +73,13 @@ Lumos::RollerShutter::RollerShutter(const char *title)
 };
 
 void Lumos::RollerShutter::handle(void) {
+  static unsigned long lastMillis = millis();
   unsigned long currentMillis = millis();
 
   // Check for < 0 because of the overflow
-  static unsigned long last500ms = 0;
-  if ((currentMillis - last500ms) >= 500 || (currentMillis - last500ms) < 0) {
-    last500ms = currentMillis;
+  static unsigned long lastMillis = 0;
+  if ((currentMillis - lastMillis) >= 500 || (currentMillis - lastMillis) < 0) {
+    lastMillis = currentMillis;
 
     static int lastUpButton = 0;
     static int lastDownButton = 0;
@@ -102,40 +103,26 @@ void Lumos::RollerShutter::handle(void) {
     lastUpButton = upButton;
     lastDownButton = downButton;
 
-    switch (drivingMode) {
-      case DrivingMode::STOP:
+    static DrivingMode lastDrivingMode = DrivingMode::STOP;
+    if (drivingMode != lastDrivingMode) {
+      if (drivingMode == DrivingMode::STOP || ((drivingMode == DrivingMode::UP || drivingMode == DrivingMode::DOWN) && lastDrivingMode != DrivingMode::STOP)) {
         Serial.println("STOP");
+        startedDrivingMillis = 0;
         digitalWrite(upOutputPin, LOW);
         digitalWrite(downOutputPin, LOW);
-        startedDrivingMillis = 0;
-        break;
-
-      case DrivingMode::UP:
+      } else if (drivingMode == DrivingMode::UP) {
         Serial.println("UP");
+        startedDrivingMillis = currentMillis;
         digitalWrite(downOutputPin, LOW);
         digitalWrite(upOutputPin, HIGH);
-        startedDrivingMillis = currentMillis;
-        break;
-
-      case DrivingMode::DOWN:
+      } else if (drivingMode == DrivingMode::DOWN) {
         Serial.println("DOWN");
+        startedDrivingMillis = currentMillis;
         digitalWrite(upOutputPin, LOW);
         digitalWrite(downOutputPin, HIGH);
-        startedDrivingMillis = currentMillis;
-        break;
+      }
     }
-  }
 
-  // Stop motor after 2 minutes
-  if ((currentMillis - startedDrivingMillis) >= 120000 && startedDrivingMillis != 0) {
-    Serial.println("Driving for 2 minutes already => STOP");
-    drivingMode = DrivingMode::STOP;
-  }
-
-  // Only update sensors all 2 seconds
-  static unsigned long last1sMillis = millis();
-  if ((currentMillis - last1sMillis) >= 2000 || (currentMillis - last1sMillis) < 0) {
-    last1sMillis = currentMillis;
 
     // Power consumption
     static float old_power = 0.0;
@@ -158,6 +145,7 @@ void Lumos::RollerShutter::handle(void) {
       drivingMode = DrivingMode::STOP;
     }
 
+
     // Temperature
     static double old_temperature = 0.0;
     float temperature = ntcSensor.getTemperature();
@@ -172,5 +160,12 @@ void Lumos::RollerShutter::handle(void) {
       Serial.print(temperature);
       Serial.println("°C");
     }
+  }
+  
+
+  // Stop motor after 2 minutes
+  if ((currentMillis - startedDrivingMillis) >= 120000 && startedDrivingMillis != 0) {
+    Serial.println("Driving for 2 minutes already => STOP");
+    drivingMode = DrivingMode::STOP;
   }
 }
