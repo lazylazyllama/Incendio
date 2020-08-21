@@ -139,10 +139,10 @@ void Lumos::RollerShutter::handle(void) {
     }
 
     // Auto relay stop by power consumption
-    /* if (power < 10 && startedDrivingMillis != 0) {
+    if (power < 10 && startedDrivingMillis != 0) {
       Serial.println("Reached top or bottom => STOP");
       drivingMode = DrivingMode::STOP;
-    } */
+    }
 
     // Temperature
     static double old_temperature = 0.0;
@@ -159,8 +159,8 @@ void Lumos::RollerShutter::handle(void) {
   }
 
   // Stop motor after 2 minutes
-  /* if ((currentMillis - startedDrivingMillis) >= 120000 && startedDrivingMillis != 0) {
+  if ((currentMillis - startedDrivingMillis) >= 120000 && startedDrivingMillis != 0) {
     Serial.println("Driving for 2 minutes already => STOP");
     drivingMode = DrivingMode::STOP;
-  } */
+  }
 }
