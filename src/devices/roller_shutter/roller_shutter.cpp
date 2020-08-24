@@ -17,7 +17,9 @@ const char *deviceTypesRollerShutter[] = { nullptr };
 
 enum class DrivingMode {
   STOP, UP, DOWN
-} drivingMode;
+};
+
+DrivingMode drivingMode = DrivingMode::STOP;
 
 ThingActionObject* stop_action(DynamicJsonDocument *input) {
   drivingMode = DrivingMode::STOP;
@@ -139,7 +141,7 @@ void Lumos::RollerShutter::handle(void) {
     }
 
     // Auto relay stop by power consumption
-    if (power < 10 && startedDrivingMillis != 0) {
+    if (power < 10 && ((currentMillis - startedDrivingMillis) >= 500)) {
       Serial.println("Reached top or bottom => STOP");
       drivingMode = DrivingMode::STOP;
     }
