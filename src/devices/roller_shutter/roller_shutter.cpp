@@ -141,7 +141,7 @@ void Lumos::RollerShutter::handle(void) {
     }
 
     // Auto relay stop by power consumption
-    if (power < 10 && ((currentMillis - startedDrivingMillis) >= 500)) {
+    if (power < 10 && ((currentMillis - startedDrivingMillis) >= 500) && startedDrivingMillis != 0) {
       Serial.println("Reached top or bottom => STOP");
       drivingMode = DrivingMode::STOP;
     }
